@@ -5,6 +5,8 @@ import cors from 'cors'
 import passport from 'passport'
 import passportStrategy from './middleware/passport-strategy'
 
+import userRoutes from './routes/user.routes'
+
 dotenv.config()
 
 const app = express()
@@ -21,5 +23,7 @@ passport.use(passportStrategy)
 
 app.use(express.urlencoded({ extended: true }))
 app.use(json())
+
+app.use('/api/test', userRoutes)
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`))
