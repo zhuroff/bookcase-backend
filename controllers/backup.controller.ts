@@ -1,12 +1,28 @@
 import { Request, Response } from 'express'
+import { PaginateModel } from 'mongoose'
+import { WritingOptions } from 'xlsx'
 import fs from 'fs'
 import path from 'path'
+import xlsx from 'json-as-xlsx'
 import Book from '../models/book.model'
 import Author from '../models/author.model'
 import Genre from '../models/genre.model'
 import List from '../models/list.model'
 import Publisher from '../models/publisher.model'
 import Series from '../models/series.model'
+
+type BackupModel = {
+  [index: string]: PaginateModel<any>
+}
+
+const backupModels: BackupModel = {
+  books: Book,
+  authors: Author,
+  genres: Genre,
+  lists: List,
+  publishers: Publisher,
+  series: Series
+}
 
 const writeBackupFile = async (filename: string, data: any) => {
   fs.writeFile(
@@ -30,158 +46,91 @@ const readBackupFile = (filename: string) => {
   })
 }
 
-const backupBooksSave = async (req: Request, res: Response) => {
+const list = (req: Request, res: Response) => {
   try {
-    const response = await Book.find({}).lean()
-    await writeBackupFile('books.json', response)
-
-    res.json({ message: 'Books data backup completed successfully' })
+    fs.readdir(
+      path.join(__dirname, '../backups'),
+      (error, files) => {
+        if (error) return error
+        res.json(files)
+      }
+    )
   } catch (error) {
     res.status(500).json(error)
   }
 }
 
-const backupAuthorsSave = async (req: Request, res: Response) => {
-  try {
-    const response = await Author.find({}).lean()
-    await writeBackupFile('authors.json', response)
-    
-    res.json({ message: 'Authors data backup completed successfully' })
-  } catch (error) {
-    res.status(500).json(error);
-  }
+const tableColumns = (obj: any) => {
+  return Object.keys(obj).map((el: string) => ({
+    label: el,
+    value: ''
+  }))
 }
 
-const backupGenresSave = async (req: Request, res: Response) => {
+const backupsXLSX = async (req: Request, res: Response) => {
   try {
-    const response = await Genre.find({}).lean()
-    await writeBackupFile('genres.json', response)
+    const modelKey = req.params?.model
+    const fileSettings = {
+      fileName: `bookcase_${modelKey}`,
+      writeOptions: {
+        type: 'buffer',
+        bookType: 'xlsx'
+      } as WritingOptions
+    }
+    const fileContent: any = await readBackupFile(`${modelKey}.json`)
+    const filePayload = {
+      sheet: modelKey,
+      columns: tableColumns(fileContent[0]),
+      content: fileContent
+    }
 
-    res.json({ message: 'Authors data backup completed successfully' })
-  } catch (error) {
-    res.status(500).json(error)
-  }
-}
+    const buffer = xlsx([filePayload], fileSettings)
 
-const backupListsSave = async (req: Request, res: Response) => {
-  try {
-    const response = await List.find({}).lean()
-    await writeBackupFile('lists.json', response)
+    res.writeHead(200, {
+      'Content-Type': 'application/octet-stream',
+      'Content-disposition': `attachment; filename=${fileSettings.fileName}.xlsx`
+    })
 
-    res.json({ message: 'Lists data backup completed successfully' })
-  } catch (error) {
-    res.status(500).json(error)
-  }
-}
-
-const backupPublishersSave = async (req: Request, res: Response) => {
-  try {
-    const response = await Publisher.find({}).lean()
-    await writeBackupFile('publishers.json', response)
-
-    res.json({ message: 'Publishers data backup completed successfully' })
+    res.end(buffer)
   } catch (error) {
     res.status(500).json(error)
   }
 }
 
-const backupSeriesSave = async (req: Request, res: Response) => {
+const backupSave = async (req: Request, res: Response) => {
   try {
-    const response = await Series.find({}).lean()
-    await writeBackupFile('series.json', response)
+    const modelKey = req.params?.model
+    const Model = backupModels[modelKey]
+    const response = await Model.find({}).lean()
 
-    res.json({ message: 'Series data backup completed successfully' })
+    await writeBackupFile(`${modelKey}.json`, response)
+
+    res.json({ message: `${modelKey} data backup completed successfully` })
   } catch (error) {
     res.status(500).json(error)
   }
 }
 
-const backupBooksRestore = async (req: Request, res: Response) => {
+const backupRestore = async (req: Request, res: Response) => {
   try {
-    const fileContent: any = await readBackupFile('books.json')
-    await Book.deleteMany({})
-    await Book.insertMany(fileContent)
+    const modelKey = req.params?.model
+    const Model = backupModels[modelKey]
+    const fileContent: any = await readBackupFile(`${modelKey}.json`)
 
-    res.json({ message: 'Books data recovery completed successfully' })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json(error)
-  }
-}
+    await Model.deleteMany({})
+    await Model.insertMany(fileContent)
 
-const backupAuthorsRestore = async (req: Request, res: Response) => {
-  try {
-    const fileContent: any = await readBackupFile('authors.json')
-    await Author.deleteMany({})
-    await Author.insertMany(fileContent)
-
-    res.json({ message: 'Authors data recovery completed successfully' })
-  } catch (error) {
-    res.status(500).json(error)
-  }
-}
-
-const backupGenresRestore = async (req: Request, res: Response) => {
-  try {
-    const fileContent: any = await readBackupFile('genres.json')
-    await Genre.deleteMany({})
-    await Genre.insertMany(fileContent)
-
-    res.json({ message: 'Genres data recovery completed successfully' })
-  } catch (error) {
-    res.status(500).json(error)
-  }
-}
-
-const backupListsRestore = async (req: Request, res: Response) => {
-  try {
-    const fileContent: any = await readBackupFile('lists.json')
-    await List.deleteMany({})
-    await List.insertMany(fileContent)
-
-    res.json({ message: 'Lists data recovery completed successfully' })
-  } catch (error) {
-    res.status(500).json(error)
-  }
-}
-
-const backupPublishersRestore = async (req: Request, res: Response) => {
-  try {
-    const fileContent: any = await readBackupFile('publishers.json')
-    await Publisher.deleteMany({})
-    await Publisher.insertMany(fileContent)
-
-    res.json({ message: 'Publishers data recovery completed successfully' })
-  } catch (error) {
-    res.status(500).json(error)
-  }
-}
-
-const backupSeriesRestore = async (req: Request, res: Response) => {
-  try {
-    const fileContent: any = await readBackupFile('series.json')
-    await Series.deleteMany({})
-    await Series.insertMany(fileContent)
-
-    res.json({ message: 'Series data recovery completed successfully' })
+    res.json({ message: `${modelKey} data recovery completed successfully` })
   } catch (error) {
     res.status(500).json(error)
   }
 }
 
 const controller = {
-  backupBooksSave,
-  backupAuthorsSave,
-  backupGenresSave,
-  backupListsSave,
-  backupPublishersSave,
-  backupSeriesSave,
-  backupBooksRestore,
-  backupAuthorsRestore,
-  backupGenresRestore,
-  backupListsRestore,
-  backupPublishersRestore,
-  backupSeriesRestore
+  list,
+  backupsXLSX,
+  backupSave,
+  backupRestore
 }
 
 export default controller
