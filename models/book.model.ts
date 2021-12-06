@@ -84,7 +84,7 @@ const bookSchema = new Schema({
     cities: [
       {
         type: String,
-        required: true
+        required: false
       }
     ],
 
@@ -144,11 +144,13 @@ const bookSchema = new Schema({
     required: false
   },
 
-  inList: {
-    type: Schema.Types.ObjectId,
-    ref: 'list',
-    required: false
-  },
+  inList: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'list',
+      required: false
+    }
+  ],
 
   title: {
     type: String,
