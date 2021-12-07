@@ -5,7 +5,6 @@ import cors from 'cors'
 import passport from 'passport'
 import passportStrategy from './middleware/passport-strategy'
 
-import userRoutes from './routes/user.routes'
 import backupRoutes from './routes/backup.routes'
 import dashboardRoutes from './routes/dashboard.routes'
 
@@ -26,7 +25,6 @@ passport.use(passportStrategy)
 app.use(express.urlencoded({ extended: true }))
 app.use(json())
 
-app.use('/api/test', userRoutes)
 app.use('/api/backup', backupRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 

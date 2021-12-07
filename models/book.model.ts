@@ -80,39 +80,35 @@ const bookSchema = new Schema({
     }
   ],
 
-  output: {
-    cities: [
-      {
-        type: String,
-        required: false
-      }
-    ],
-
-    codes: [
-      {
-        type: String,
-        required: false
-      }
-    ],
-
-    pages: {
-      type: Number,
-      required: isRequired
-    },
-
-    year: {
-      type: Number,
-      required: isRequired
-    }
-  },
-
-  relatedPublishers: [
+  publishers: [
     {
-      type: Schema.Types.ObjectId,
-      ref: 'publisher',
-      required: true
+      publisherID: {
+        type: Schema.Types.ObjectId,
+        ref: 'publisher',
+        required: true
+      },
+
+      publisherCity: {
+        type: String,
+        required: false
+      },
+
+      publisherCode: {
+        type: String,
+        required: false
+      }
     }
   ],
+
+  publishingYear: {
+    type: Number,
+    required: isRequired
+  },
+
+  numberOfPages: {
+    type: Number,
+      required: isRequired
+  },
 
   rating: {
     type: Number,
