@@ -1,18 +1,17 @@
 import { Request, Response } from 'express'
-import { PaginateModel } from 'mongoose'
-import { WritingOptions } from 'xlsx'
+import { PaginateModel, Model } from 'mongoose'
 import fs from 'fs'
 import path from 'path'
-import xlsx from 'json-as-xlsx'
 import Book from '../models/book.model'
 import Author from '../models/author.model'
 import Genre from '../models/genre.model'
 import List from '../models/list.model'
 import Publisher from '../models/publisher.model'
 import Series from '../models/series.model'
+import Users from '../models/user.model'
 
 type BackupModel = {
-  [index: string]: PaginateModel<any>
+  [index: string]: PaginateModel<any> | Model<any, {}, {}>
 }
 
 const backupModels: BackupModel = {
@@ -21,23 +20,37 @@ const backupModels: BackupModel = {
   genres: Genre,
   lists: List,
   publishers: Publisher,
-  series: Series
+  series: Series,
+  users: Users
 }
 
-const writeBackupFile = async (filename: string, data: any) => {
-  fs.writeFile(
-    path.join(__dirname, '../backups', filename),
-    JSON.stringify(data),
-    (error) => {
-      if (error) return error
-    }
-  )
+const createBackupFolder = (folderName: string) => {
+  return new Promise((resolve, reject) => {
+    fs.mkdir(
+      path.join(__dirname, '../backups', folderName),
+      (error) => {
+        error ? reject(error) : resolve(true)
+      }
+    )
+  })
 }
 
-const readBackupFile = (filename: string) => {
+const writeBackupFile = async (fileName: string, folderName: string, data: any) => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(
+      path.join(__dirname, '../backups', folderName, fileName),
+      JSON.stringify(data),
+      (error) => {
+        error ? reject(error) : resolve(true)
+      }
+    )
+  })
+}
+
+const readBackupFile = (folderName: string, fileName: string) => {
   return new Promise((resolve, reject) => {
     fs.readFile(
-      path.join(__dirname, '../backups', filename),
+      path.join(__dirname, '../backups', folderName, fileName),
       'utf8',
       (error, data) => (
         error ? reject(error) : resolve(JSON.parse(data))
@@ -46,91 +59,80 @@ const readBackupFile = (filename: string) => {
   })
 }
 
-const list = (req: Request, res: Response) => {
+const backupList = (req: Request, res: Response) => {
   try {
-    fs.readdir(
-      path.join(__dirname, '../backups'),
-      (error, files) => {
-        if (error) return error
-        res.json(files)
-      }
-    )
+    const folders = fs.readdirSync(path.join(__dirname, '../backups'))
+    res.json(folders)
   } catch (error) {
-    res.status(500).json(error)
-  }
-}
-
-const tableColumns = (obj: any) => {
-  return Object.keys(obj).map((el: string) => ({
-    label: el,
-    value: ''
-  }))
-}
-
-const backupsXLSX = async (req: Request, res: Response) => {
-  try {
-    const modelKey = req.params?.model
-    const fileSettings = {
-      fileName: `bookcase_${modelKey}`,
-      writeOptions: {
-        type: 'buffer',
-        bookType: 'xlsx'
-      } as WritingOptions
-    }
-    const fileContent: any = await readBackupFile(`${modelKey}.json`)
-    const filePayload = {
-      sheet: modelKey,
-      columns: tableColumns(fileContent[0]),
-      content: fileContent
-    }
-
-    const buffer = xlsx([filePayload], fileSettings)
-
-    res.writeHead(200, {
-      'Content-Type': 'application/octet-stream',
-      'Content-disposition': `attachment; filename=${fileSettings.fileName}.xlsx`
-    })
-
-    res.end(buffer)
-  } catch (error) {
+    console.error(error)
     res.status(500).json(error)
   }
 }
 
 const backupSave = async (req: Request, res: Response) => {
+  const timestamp = String(new Date().getTime())
+
   try {
-    const modelKey = req.params?.model
-    const Model = backupModels[modelKey]
-    const response = await Model.find({}).lean()
+    await createBackupFolder(timestamp)
 
-    await writeBackupFile(`${modelKey}.json`, response)
+    const backupProcess = Object.keys(backupModels).map(async (el: string) => {
+      const Model = backupModels[el]
+      const response = await Model.find({}).lean()
 
-    res.json({ message: `${modelKey} data backup completed successfully` })
+      return await writeBackupFile(`${el}.json`, timestamp, response)
+    })
+
+    await Promise.all(backupProcess)
+    res.json({ message: 'Data backup completed successfully' })
   } catch (error) {
     res.status(500).json(error)
   }
 }
 
 const backupRestore = async (req: Request, res: Response) => {
+  const folderName = req.params.date
+
   try {
-    const modelKey = req.params?.model
-    const Model = backupModels[modelKey]
-    const fileContent: any = await readBackupFile(`${modelKey}.json`)
+    const restoreProcess = Object.keys(backupModels).map(async (el: string) => {
+      const Model = backupModels[el]
+      const fileContent: any = await readBackupFile(folderName, `${el}.json`)
 
-    await Model.deleteMany({})
-    await Model.insertMany(fileContent)
+      await Model.deleteMany({})
+      await Model.insertMany(fileContent)
 
-    res.json({ message: `${modelKey} data recovery completed successfully` })
+      return el
+    })
+
+    await Promise.all(restoreProcess)
+    res.json({ message: 'Data restore completed successfully' })
   } catch (error) {
     res.status(500).json(error)
   }
 }
 
+const backupDelete = (req: Request, res: Response) => {
+  const folderName = req.params.date
+
+  try {
+    fs.rm(
+      path.join(__dirname, '../backups', folderName),
+      { recursive: true },
+      (error) => {
+        if (error) throw new Error(error.message || 'Something went wrong')
+        res.json({ message: 'Backup was successfully deleted' })
+      }
+    )
+  } catch (error) {
+    console.log(error)
+    res.status(500).json(error)
+  }
+}
+
 const controller = {
-  list,
-  backupsXLSX,
+  backupList,
   backupSave,
-  backupRestore
+  backupRestore,
+  backupDelete
 }
 
 export default controller
