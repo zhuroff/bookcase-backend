@@ -1,7 +1,6 @@
 import { Date } from "mongoose"
 
 interface User {
-  login: string
   email: string
   name: string
   role: string

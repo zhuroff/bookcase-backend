@@ -2,12 +2,6 @@ import { model, Schema } from 'mongoose'
 import { UserModel } from '../types/User'
 
 const UserSchema = new Schema<UserModel>({
-  login: {
-    type: String,
-    unique: true,
-    required: true
-  },
-
   email: {
     type: String,
     required: true
@@ -21,7 +15,7 @@ const UserSchema = new Schema<UserModel>({
 
   name: {
     type: String,
-    required: true
+    required: false
   },
 
   role: {
