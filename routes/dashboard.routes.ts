@@ -1,12 +1,12 @@
 import { Router } from 'express'
+import passport from 'passport'
 import controller from '../controllers/dashboard.controller'
 
-// const passport = require('passport')
 const router = Router()
 
 router.get(
   '/reading-books',
-  // passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', { session: false }),
   controller.readingNow
 )
 

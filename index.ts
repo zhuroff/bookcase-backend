@@ -8,6 +8,7 @@ import passportStrategy from './middleware/passport-strategy'
 import backupRoutes from './routes/backup.routes'
 import userRoutes from './routes/user.routes'
 import dashboardRoutes from './routes/dashboard.routes'
+import bookRoutes from './routes/book.routes'
 
 dotenv.config()
 
@@ -29,5 +30,6 @@ app.use(json())
 app.use('/api/backup', backupRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/dashboard', dashboardRoutes)
+app.use('/api/books', bookRoutes)
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`))

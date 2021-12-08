@@ -21,7 +21,6 @@ const readingNow = async (req: Request, res: Response) => {
     const response = await Book.find(filter, bookFieldsConfig)
       .populate({ path: 'relatedGenres', select: ['title', '_id'] })
       .populate({ path: 'relatedAuthors', select: ['title', '_id'] })
-      .populate({ path: 'relatedSeries', select: ['title', '_id'] })
       .populate({ path: 'inList', select: ['title', '_id'] })
       .sort({ 'readingStatus.startReading': -1 })
 
