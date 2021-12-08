@@ -10,4 +10,10 @@ router.post(
   controller.booksList
 )
 
+router.get(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  controller.bookItem
+)
+
 export default router

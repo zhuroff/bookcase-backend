@@ -14,15 +14,15 @@ const bookFieldsConfig = {
 const readingNow = async (req: Request, res: Response) => {
   const filter = {
     isDraft: false,
-    'readingStatus.readingProcess': 'Читаю сейчас'
+    'status.process': 'reading'
   }
 
   try {
     const response = await Book.find(filter, bookFieldsConfig)
-      .populate({ path: 'relatedGenres', select: ['title', '_id'] })
-      .populate({ path: 'relatedAuthors', select: ['title', '_id'] })
+      .populate({ path: 'genres', select: ['title', '_id'] })
       .populate({ path: 'inList', select: ['title', '_id'] })
-      .sort({ 'readingStatus.startReading': -1 })
+      .populate({ path: 'authors.author', select: ['title', '_id'] })
+      .sort({ 'status.start': -1 })
 
     res.json(response)
   } catch (error) {
@@ -34,8 +34,8 @@ const readingNow = async (req: Request, res: Response) => {
 const readCompletely = async (req: Request, res: Response) => {
   const filter = {
     isDraft: false,
-    'readingStatus.readingProcess': 'Прочитано',
-    'readingStatus.finishReading': {
+    'status.process': 'read',
+    'status.finish': {
       $gte: `${req.body.year}-01-01`,
       $lte: `${req.body.year}-12-31`
     }
@@ -43,11 +43,10 @@ const readCompletely = async (req: Request, res: Response) => {
 
   try {
     const response = await Book.find(filter, bookFieldsConfig)
-      .populate({ path: 'relatedGenres', select: ['title', '_id'] })
-      // .populate({ path: 'relatedAuthors', select: ['title', '_id'] })
-      // .populate({ path: 'relatedSeries', select: ['title', '_id'] })
+      .populate({ path: 'genres', select: ['title', '_id'] })
       .populate({ path: 'inList', select: ['title', '_id'] })
-      .sort({ 'readingStatus.finishReading': -1 })
+      .populate({ path: 'authors.author', select: ['title', '_id'] })
+      .sort({ 'status.finish': -1 })
 
     res.json(response)
   } catch (error) {
@@ -61,7 +60,7 @@ const genresDiagram = async (req: Request, res: Response) => {
       .populate({
         path: 'relatedBooks',
         select: ['title'],
-        match: { 'readingStatus.readingProcess': { $eq: 'Прочитано' } }
+        match: { 'status.process': { $eq: 'read' } }
       })
     
     res.json(response)
@@ -85,7 +84,7 @@ const listsProgress = async (req: Request, res: Response) => {
     const response = await List.find({ isDraft: false }, { title: true })
       .populate({
         path: 'lists.contents.book',
-        select: ['title', 'readingStatus']
+        select: ['title', 'status']
       })
 
     res.json(response)

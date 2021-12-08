@@ -1,8 +1,8 @@
 import { model, Schema } from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
-import { Book } from '../types/Book'
+import { BookModel } from '../types/Book'
 
-const isRequired = (): boolean => (this as unknown as Book).isDraft
+const isRequired = (): boolean => (this as unknown as BookModel).isDraft
 
 const bookSchema = new Schema({
   isDraft: {
@@ -10,34 +10,73 @@ const bookSchema = new Schema({
     required: true
   },
 
+  title: {
+    type: String,
+    required: isRequired,
+    index: true
+  },
+
+  subtitle: {
+    type: String,
+    required: false,
+    index: true
+  },
+
   article: {
     type: String,
     required: false
   },
 
-  relatedAuthors: [
+  authors: [
     {
-      type: Schema.Types.ObjectId,
-      ref: 'author',
-      required: true
-    }
-  ],
-
-  authorsRole: [
-    {
-      authorID: {
-        type: String,
+      author: {
+        type: Schema.Types.ObjectId,
+        ref: 'author',
         required: true
       },
 
-      authorRole: {
+      role: {
         type: String,
         required: true
       }
     }
   ],
 
-  bookFormat: {
+  genres: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'genre',
+      required: true
+    }
+  ],
+
+  series: {
+    type: Schema.Types.ObjectId,
+    ref: 'series',
+    required: false
+  },
+
+  publishers: [
+    {
+      publisher: {
+        type: Schema.Types.ObjectId,
+        ref: 'publisher',
+        required: true
+      },
+
+      city: {
+        type: String,
+        required: false
+      },
+
+      code: {
+        type: String,
+        required: false
+      }
+    }
+  ],
+
+  format: {
     type: String,
     required: isRequired
   },
@@ -58,7 +97,7 @@ const bookSchema = new Schema({
   },
 
   dateCreated: {
-    type: Date,
+    type: Schema.Types.Date,
     default: Date.now
   },
 
@@ -72,42 +111,30 @@ const bookSchema = new Schema({
     required: false
   },
 
-  relatedGenres: [
+  links: [
     {
-      type: Schema.Types.ObjectId,
-      ref: 'genre',
-      required: true
-    }
-  ],
-
-  publishers: [
-    {
-      publisherID: {
-        type: Schema.Types.ObjectId,
-        ref: 'publisher',
+      url: {
+        type: String,
         required: true
       },
 
-      publisherCity: {
+      title: {
         type: String,
         required: false
       },
 
-      publisherCode: {
-        type: String,
-        required: false
-      }
+      required: false
     }
   ],
 
-  publishingYear: {
+  publicationYear: {
     type: Number,
     required: isRequired
   },
 
-  numberOfPages: {
+  pages: {
     type: Number,
-      required: isRequired
+    required: isRequired
   },
 
   rating: {
@@ -115,28 +142,22 @@ const bookSchema = new Schema({
     required: false
   },
 
-  readingStatus: {
-    startReading: {
+  status: {
+    start: {
       type: Date,
       required: false
     },
 
-    finishReading: {
+    finish: {
       type: Date,
       required: false
     },
 
-    readingProcess: {
+    process: {
       type: String,
       required: false
     },
 
-    required: false
-  },
-
-  relatedSeries: {
-    type: Schema.Types.ObjectId,
-    ref: 'series',
     required: false
   },
 
@@ -146,19 +167,7 @@ const bookSchema = new Schema({
       ref: 'list',
       required: false
     }
-  ],
-
-  title: {
-    type: String,
-    required: isRequired,
-    index: true
-  },
-
-  subtitle: {
-    type: String,
-    required: false,
-    index: true
-  }
+  ]
 })
 
 bookSchema.plugin(mongoosePaginate)

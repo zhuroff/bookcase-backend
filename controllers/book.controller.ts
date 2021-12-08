@@ -3,9 +3,9 @@ import Book from '../models/book.model'
 
 const booksList = async (req: Request, res: Response) => {
   const booksListPopulates = [
-    { path: 'relatedAuthors', select: ['title', '_id'] },
-    { path: 'relatedGenres', select: ['title', '_id'] },
-    { path: 'inList', select: ['title', '_id'] }
+    { path: 'genres', select: ['title', '_id'] },
+    { path: 'inList', select: ['title', '_id'] },
+    { path: 'authors.author', select: ['title', '_id'] }
   ]
   const booksListOptions = {
     page: req.body.page,
@@ -18,8 +18,8 @@ const booksList = async (req: Request, res: Response) => {
       subtitle: true,
       coverImage: true,
       dateCreated: true,
-      readingStatus: true,
-      'output.year': true
+      status: true,
+      publicationYear: true
     }
   }
   
@@ -31,8 +31,24 @@ const booksList = async (req: Request, res: Response) => {
   }
 }
 
+const bookItem = async (req: Request, res: Response) => {
+  try {
+    const book = await Book.findById(req.params.id)
+      .populate({ path: 'genres', select: ['title', '_id'] })
+      .populate({ path: 'series', select: ['title', '_id'] })
+      .populate({ path: 'inList', select: ['title', '_id'] })
+      .populate({ path: 'authors.author', select: ['title', '_id'] })
+      .populate({ path: 'publishers.publisher', select: ['title', '_id'] })
+      
+    res.json(book)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+}
+
 const controller = {
-  booksList
+  booksList,
+  bookItem
 }
 
 export default controller

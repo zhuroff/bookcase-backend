@@ -1,56 +1,53 @@
-import { Date } from 'mongoose'
+import { Schema, Date } from 'mongoose'
 
-interface AuthorRole {
-  authorID: string
-  authorRole: string
+interface BookAuthor {
+  author: Schema.Types.ObjectId
+  role: string
 }
 
-interface BookOutput {
-  cities: string[]
-  codes: string[]
-  pages: number
-  year: number
+interface BookPublishers {
+  publisher: Schema.Types.ObjectId
+  city: string
+  code: string
+}
+
+interface BooksLinks {
+  url: string
+  title: string
 }
 
 interface ReadingStatus {
-  startReading: Date | null
-  finishReading: Date | null
-  readingProcess: string
+  start: Date | null
+  finish: Date | null
+  process: string
 }
 
-interface BookCategoryRow {
-  _id: string
-  collection: string
-}
-
-interface Book {
-  _id: string
+interface BookModel {
+  _id?: string
   isDraft: boolean
-  article: string | null
-  relatedAuthors: string[]
-  authorsRole: AuthorRole[]
-  bookFormat: string
-  contents: string | null
+  title: string
+  subtitle: string
+  article?: string
+  authors: BookAuthor[]
+  genres: Schema.Types.ObjectId[]
+  series: Schema.Types.ObjectId
+  publishers: BookPublishers[]
+  format: string
+  contents?: string
   coverImage: string | Blob | null
   coverType: string
   dateCreated: Date
-  description: string | null
-  file: string | null
-  relatedGenres: string[]
-  output: BookOutput
-  relatedPublishers: string[]
+  description?: string
+  file?: string
+  links: BooksLinks[]
+  publicationYear: number,
+  pages: number,
   rating: number
-  readingStatus: ReadingStatus
-  relatedSeries: string | null
-  inList: string[]
-  title: string
-  subtitle: string
+  status: ReadingStatus
+  inList: Schema.Types.ObjectId[]
 }
 
 export {
-  AuthorRole,
-  BookOutput,
   ReadingStatus,
-  BookCategoryRow,
-  Book
+  BookModel
 }
