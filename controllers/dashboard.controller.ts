@@ -5,13 +5,10 @@ import List from '../models/list.model'
 
 const bookFieldsConfig = {
   title: true,
-  isDraft: true,
   subtitle: true,
   coverImage: true,
-  dateCreated: true,
   readingStatus: true,
-  'output.year': true,
-  'output.pages': true
+  publishingYear: true
 }
 
 const readingNow = async (req: Request, res: Response) => {
@@ -23,12 +20,10 @@ const readingNow = async (req: Request, res: Response) => {
   try {
     const response = await Book.find(filter, bookFieldsConfig)
       .populate({ path: 'relatedGenres', select: ['title', '_id'] })
-      // .populate({ path: 'relatedAuthors', select: ['title', '_id'] })
-      // .populate({ path: 'relatedSeries', select: ['title', '_id'] })
+      .populate({ path: 'relatedAuthors', select: ['title', '_id'] })
+      .populate({ path: 'relatedSeries', select: ['title', '_id'] })
       .populate({ path: 'inList', select: ['title', '_id'] })
       .sort({ 'readingStatus.startReading': -1 })
-
-      console.log(response)
 
     res.json(response)
   } catch (error) {
