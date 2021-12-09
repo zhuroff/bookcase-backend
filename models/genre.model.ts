@@ -18,6 +18,11 @@ const genreSchema = new Schema({
     default: Date.now
   },
 
+  picture: {
+    type: String,
+    required: false
+  },
+
   relatedBooks: [
     {
       type: Schema.Types.ObjectId,

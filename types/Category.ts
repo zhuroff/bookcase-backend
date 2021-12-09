@@ -6,6 +6,7 @@ interface CategoryBasic {
   _id: string
   dateCreated: Date
   relatedBooks: string[]
+  picture?: string
 }
 
 interface CategoryAuthor extends CategoryBasic {

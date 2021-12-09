@@ -36,6 +36,11 @@ const authorSchema = new Schema({
     index: true
   },
 
+  picture: {
+    type: String,
+    required: false
+  },
+
   relatedBooks: [
     {
       type: Schema.Types.ObjectId,

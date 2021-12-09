@@ -28,6 +28,11 @@ const seriesSchema = new Schema({
     required: false
   },
 
+  picture: {
+    type: String,
+    required: false
+  },
+
   relatedBooks: [
     {
       type: Schema.Types.ObjectId,
