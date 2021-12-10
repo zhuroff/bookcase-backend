@@ -91,6 +91,11 @@ const bookSchema = new Schema({
     required: isRequired
   },
 
+  preCoverImage: {
+    type: String,
+    default: ''
+  },
+
   coverType: {
     type: String,
     required: isRequired

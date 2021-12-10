@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon index.ts --watch * --ignore backups"
+    "dev": "cross-env NODE_ENV=development nodemon index.ts --watch * --ignore backups uploads"
   },
   "author": "Eugene Zhurov",
   "license": "ISC",

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import passport from 'passport'
+import upload from '../middleware/upload'
 import controller from '../controllers/book.controller'
 
 const router = Router()
@@ -14,6 +15,19 @@ router.get(
   '/:id',
   passport.authenticate('jwt', { session: false }),
   controller.bookItem
+)
+
+router.post(
+  '/:id/precover',
+  passport.authenticate('jwt', { session: false }),
+  upload.single('preCoverImage'),
+  controller.setPreCover
+)
+
+router.delete(
+  '/:id/precover',
+  passport.authenticate('jwt', { session: false }),
+  controller.removePreCover
 )
 
 export default router

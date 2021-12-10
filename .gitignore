@@ -30,6 +30,9 @@ jspm_packages/
 # Backup files
 backups/
 
+# Public folder
+uploads/
+
 # Optional npm cache directory
 .npm
 

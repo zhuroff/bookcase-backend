@@ -34,7 +34,8 @@ interface BookModel {
   publishers: BookPublishers[]
   format: string
   contents?: string
-  coverImage: string | Blob | null
+  coverImage: string | null
+  preCoverImage: string | undefined
   coverType: string
   dateCreated: Date
   description?: string

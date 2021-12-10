@@ -32,4 +32,6 @@ app.use('/api/users', userRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/books', bookRoutes)
 
+app.use('/uploads', express.static(__dirname + '/uploads'))
+
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`))
