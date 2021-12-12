@@ -106,6 +106,11 @@ const bookSchema = new Schema({
     default: Date.now
   },
 
+  dateModified: {
+    type: Schema.Types.Date,
+    default: Date.now
+  },
+
   description: {
     type: String,
     required: isRequired

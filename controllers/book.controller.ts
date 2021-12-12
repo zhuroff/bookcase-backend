@@ -1,11 +1,34 @@
 import { Request, Response } from 'express'
+import { BookModel } from '../types/Book'
 import fs from 'fs'
 import path from 'path'
 import Book from '../models/book.model'
-import { BookModel } from '../types/Book'
 
 interface MulterRequest extends Request {
   file: any
+}
+
+const removePreCoverFile = (filename: string) => {
+  fs.rm(
+    path.join(__dirname, '../', filename),
+    { recursive: true },
+    (error) => {
+      if (error) {
+        throw new Error(error.message)
+      }
+    }
+  )
+}
+
+const cleanPreCoverField = (id: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await Book.updateOne({ _id: id }, { $set: { preCoverImage: '' }})
+      resolve(true)
+    } catch (error) {
+      reject(error)
+    }
+  })
 }
 
 const booksList = async (req: Request, res: Response) => {
@@ -40,12 +63,25 @@ const booksList = async (req: Request, res: Response) => {
 
 const bookItem = async (req: Request, res: Response) => {
   try {
-    const book = await Book.findById(req.params.id)
+    const book: BookModel = await Book.findById(req.params.id)
       .populate({ path: 'genres', select: ['title', '_id'] })
       .populate({ path: 'series', select: ['title', '_id'] })
       .populate({ path: 'inList', select: ['title', '_id'] })
       .populate({ path: 'authors.author', select: ['title', '_id'] })
       .populate({ path: 'publishers.publisher', select: ['title', '_id'] })
+      .lean()
+    
+    if (book.preCoverImage) {
+      const currentServerDate = new Date().getTime()
+      const bookModifiedTime = new Date(book.dateModified).getTime()
+      const timeDifference = (currentServerDate - bookModifiedTime) / 60_000
+      
+      if (timeDifference > 10) {
+        removePreCoverFile(book.preCoverImage)
+        cleanPreCoverField(req.params.id)
+        delete book.preCoverImage
+      }
+    }
       
     res.json(book)
   } catch (error) {
@@ -56,11 +92,12 @@ const bookItem = async (req: Request, res: Response) => {
 const setPreCover = async (req: Request, res: Response) => {
   try {
     const cover = (req as MulterRequest).file
-      ? `/covers/${(req as MulterRequest).file.filename}`
+      ? `/uploads/covers/${(req as MulterRequest).file.filename}`
       : req.body.preCoverImage
 
     const $set = {
-      preCoverImage: cover
+      preCoverImage: cover,
+      dateModified: new Date()
     }
 
     await Book.findOneAndUpdate({
@@ -74,38 +111,14 @@ const setPreCover = async (req: Request, res: Response) => {
 }
 
 const removePreCover = async (req: Request, res: Response) => {
-  console.log('Here')
-  try {
-    await Book.findById(
-      req.params.id,
-      async (error: Error, data: BookModel) => {
-        if (error) {
-          return res.status(500).json(error)
-        }
-
-        const filename = data.preCoverImage as string
-
-        await Book.updateOne(
-          { _id: req.params.id },
-          { $unset: { preCoverImage: '' }
-        }).clone()
-
-        fs.rm(
-          path.join(__dirname, '../uploads', filename),
-          { recursive: true },
-          (err) => {
-            if (err) {
-              return res.status(500).json(err)
-            }
-          }
-        )
-      }
-    ).clone()
-
-    res.json({ success: true })
-  } catch (error) {
-    res.status(500).json(error)
-  }
+  Book.findById(req.params.id, { preCoverImage: true })
+    .then((book: any) => book.preCoverImage)
+    .then((filename: string) => {
+      removePreCoverFile(filename)
+      cleanPreCoverField(req.params.id)
+        .then(() => res.json({ success: true }))
+    })
+    .catch((error: Error) => res.status(500).json(error))
 }
 
 const controller = {

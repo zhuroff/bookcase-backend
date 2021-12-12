@@ -37,7 +37,8 @@ interface BookModel {
   coverImage: string | null
   preCoverImage: string | undefined
   coverType: string
-  dateCreated: Date
+  dateCreated: string,
+  dateModified: string,
   description?: string
   file?: string
   links: BooksLinks[]
