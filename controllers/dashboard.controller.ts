@@ -14,7 +14,8 @@ const bookFieldsConfig = {
 const readingNow = async (req: Request, res: Response) => {
   const filter = {
     isDraft: false,
-    'status.process': 'reading'
+    'status.start': { $ne: null },
+    'status.finish': { $eq: null }
   }
 
   try {
@@ -34,7 +35,6 @@ const readingNow = async (req: Request, res: Response) => {
 const readCompletely = async (req: Request, res: Response) => {
   const filter = {
     isDraft: false,
-    'status.process': 'read',
     'status.finish': {
       $gte: `${req.body.year}-01-01`,
       $lte: `${req.body.year}-12-31`
@@ -60,7 +60,7 @@ const genresDiagram = async (req: Request, res: Response) => {
       .populate({
         path: 'relatedBooks',
         select: ['title'],
-        match: { 'status.process': { $eq: 'read' } }
+        match: { 'status.finish': { $ne: null } }
       })
     
     res.json(response)

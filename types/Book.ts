@@ -19,7 +19,6 @@ interface BooksLinks {
 interface ReadingStatus {
   start: Date | null
   finish: Date | null
-  process: string
 }
 
 interface BookModel {
@@ -27,7 +26,7 @@ interface BookModel {
   isDraft: boolean
   title: string
   subtitle: string
-  article?: string
+  summary?: string
   authors: BookAuthor[]
   genres: Schema.Types.ObjectId[]
   series: Schema.Types.ObjectId

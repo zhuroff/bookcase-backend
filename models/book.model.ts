@@ -22,7 +22,7 @@ const bookSchema = new Schema({
     index: true
   },
 
-  article: {
+  summary: {
     type: String,
     required: false
   },
@@ -160,11 +160,6 @@ const bookSchema = new Schema({
 
     finish: {
       type: Date,
-      required: false
-    },
-
-    process: {
-      type: String,
       required: false
     },
 
