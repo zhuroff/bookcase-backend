@@ -33,7 +33,8 @@ const cleanPreCoverField = (id: string) => {
 
 const update = async (req: Request, res: Response) => {
   const $set = {
-    summary: req.body.summary
+    summary: req.body.summary,
+    dateModified: new Date()
   }
 
   try {
