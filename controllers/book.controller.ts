@@ -31,6 +31,22 @@ const cleanPreCoverField = (id: string) => {
   })
 }
 
+const update = async (req: Request, res: Response) => {
+  const $set = {
+    summary: req.body.summary
+  }
+
+  try {
+    const result = await Book.findOneAndUpdate({
+      _id: req.params.id
+    }, { $set }, { new: true })
+
+    res.json(result)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+}
+
 const booksList = async (req: Request, res: Response) => {
   const booksListPopulates = [
     { path: 'genres', select: ['title', '_id'] },
@@ -122,6 +138,7 @@ const removePreCover = async (req: Request, res: Response) => {
 }
 
 const controller = {
+  update,
   booksList,
   bookItem,
   setPreCover,

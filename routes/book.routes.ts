@@ -17,6 +17,13 @@ router.get(
   controller.bookItem
 )
 
+router.patch(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  upload.single('coverImage'),
+  controller.update
+)
+
 router.post(
   '/:id/precover',
   passport.authenticate('jwt', { session: false }),
