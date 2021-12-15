@@ -5,10 +5,7 @@ import List from '../models/list.model'
 
 const bookFieldsConfig = {
   title: true,
-  subtitle: true,
-  coverImage: true,
-  readingStatus: true,
-  publishingYear: true
+  coverImage: true
 }
 
 const readingNow = async (req: Request, res: Response) => {
@@ -21,7 +18,7 @@ const readingNow = async (req: Request, res: Response) => {
   try {
     const response = await Book.find(filter, bookFieldsConfig)
       .populate({ path: 'genres', select: ['title', '_id'] })
-      .populate({ path: 'inList', select: ['title', '_id'] })
+      .populate({ path: 'lists', select: ['title', '_id'] })
       .populate({ path: 'authors.author', select: ['title', '_id'] })
       .sort({ 'status.start': -1 })
 
@@ -44,7 +41,7 @@ const readCompletely = async (req: Request, res: Response) => {
   try {
     const response = await Book.find(filter, bookFieldsConfig)
       .populate({ path: 'genres', select: ['title', '_id'] })
-      .populate({ path: 'inList', select: ['title', '_id'] })
+      .populate({ path: 'lists', select: ['title', '_id'] })
       .populate({ path: 'authors.author', select: ['title', '_id'] })
       .sort({ 'status.finish': -1 })
 

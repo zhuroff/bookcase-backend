@@ -45,7 +45,7 @@ interface BookModel {
   pages: number,
   rating: number
   status: ReadingStatus
-  inList: Schema.Types.ObjectId[]
+  lists: Schema.Types.ObjectId[]
 }
 
 export {

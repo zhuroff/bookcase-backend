@@ -51,7 +51,7 @@ const update = async (req: Request, res: Response) => {
 const booksList = async (req: Request, res: Response) => {
   const booksListPopulates = [
     { path: 'genres', select: ['title', '_id'] },
-    { path: 'inList', select: ['title', '_id'] },
+    { path: 'lists', select: ['title', '_id'] },
     { path: 'authors.author', select: ['title', '_id'] }
   ]
   const booksListOptions = {
@@ -83,7 +83,7 @@ const bookItem = async (req: Request, res: Response) => {
     const book: BookModel = await Book.findById(req.params.id)
       .populate({ path: 'genres', select: ['title', '_id'] })
       .populate({ path: 'series', select: ['title', '_id'] })
-      .populate({ path: 'inList', select: ['title', '_id'] })
+      .populate({ path: 'lists', select: ['title', '_id'] })
       .populate({ path: 'authors.author', select: ['title', '_id'] })
       .populate({ path: 'publishers.publisher', select: ['title', '_id'] })
       .lean()

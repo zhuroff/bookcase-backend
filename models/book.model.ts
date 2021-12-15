@@ -166,7 +166,7 @@ const bookSchema = new Schema({
     required: false
   },
 
-  inList: [
+  lists: [
     {
       type: Schema.Types.ObjectId,
       ref: 'list',
