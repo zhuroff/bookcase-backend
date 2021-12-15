@@ -10,4 +10,10 @@ router.post(
   controller.listsCollections
 )
 
+router.get(
+  '/:id/sub',
+  passport.authenticate('jwt', { session: false }),
+  controller.listShort
+)
+
 export default router

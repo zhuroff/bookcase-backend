@@ -11,8 +11,22 @@ const listsCollections = async (req: Request, res: Response) => {
   }
 }
 
+const listShort = async (req: Request, res: Response) => {
+  try {
+    const filter = {
+      'lists.title': true,
+      'lists._id': true
+    }
+    const response = await List.findById(req.params.id, filter)
+    res.json(response)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+}
+
 const controller = {
-  listsCollections
+  listsCollections,
+  listShort
 }
 
 export default controller
