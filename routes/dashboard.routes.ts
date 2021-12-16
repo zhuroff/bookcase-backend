@@ -10,11 +10,11 @@ router.get(
   controller.readingNow
 )
 
-// router.post(
-//   '/admin/read',
-//   // passport.authenticate('jwt', { session: false }),
-//   controller.getRead
-// )
+router.post(
+  '/read-books',
+  passport.authenticate('jwt', { session: false }),
+  controller.readCompletely
+)
 
 // router.get(
 //   '/admin/genres',

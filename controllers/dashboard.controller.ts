@@ -5,7 +5,8 @@ import List from '../models/list.model'
 
 const bookFieldsConfig = {
   title: true,
-  coverImage: true
+  coverImage: true,
+  pages: true
 }
 
 const readingNow = async (req: Request, res: Response) => {
