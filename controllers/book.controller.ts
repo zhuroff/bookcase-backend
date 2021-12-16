@@ -8,7 +8,7 @@ interface MulterRequest extends Request {
   file: any
 }
 
-const removePreCoverFile = (filename: string) => {
+const removeMediaFile = (filename: string) => {
   fs.rm(
     path.join(__dirname, '../', filename),
     { recursive: true },
@@ -94,7 +94,7 @@ const bookItem = async (req: Request, res: Response) => {
       const timeDifference = (currentServerDate - bookModifiedTime) / 60_000
       
       if (timeDifference > 10) {
-        removePreCoverFile(book.preCoverImage)
+        removeMediaFile(book.preCoverImage)
         cleanPreCoverField(req.params.id)
         delete book.preCoverImage
       }
@@ -131,11 +131,37 @@ const removePreCover = async (req: Request, res: Response) => {
   Book.findById(req.params.id, { preCoverImage: true })
     .then((book: any) => book.preCoverImage)
     .then((filename: string) => {
-      removePreCoverFile(filename)
+      removeMediaFile(filename)
       cleanPreCoverField(req.params.id)
         .then(() => res.json({ success: true }))
     })
     .catch((error: Error) => res.status(500).json(error))
+}
+
+const setArticleImage = async (req: Request, res: Response) => {
+  try {
+    const image = (req as MulterRequest).file
+      ? `/uploads/articles/${(req as MulterRequest).file.filename}`
+      : null
+
+    res.json({ articleImage: image })
+  } catch (error) {
+    res.status(500).json(error)
+  }
+}
+
+const removeArticleImage = async (req: Request, res: Response) => {
+  const payload = JSON.parse(req.body.urls)
+
+  try {
+    const deletedImages = payload.map((el: string) => (
+      removeMediaFile(el)
+    ))
+
+    res.json({ deleted: deletedImages })
+  } catch (error) {
+    res.status(500).json(error)
+  }
 }
 
 const controller = {
@@ -143,7 +169,9 @@ const controller = {
   booksList,
   bookItem,
   setPreCover,
-  removePreCover
+  removePreCover,
+  setArticleImage,
+  removeArticleImage
 }
 
 export default controller

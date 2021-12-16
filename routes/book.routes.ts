@@ -37,4 +37,18 @@ router.delete(
   controller.removePreCover
 )
 
+router.post(
+  '/:id/summary',
+  passport.authenticate('jwt', { session: false }),
+  upload.single('articleImage'),
+  controller.setArticleImage
+)
+
+router.post(
+  '/summary/images/delete',
+  passport.authenticate('jwt', { session: false }),
+  upload.single('null'),
+  controller.removeArticleImage
+)
+
 export default router
