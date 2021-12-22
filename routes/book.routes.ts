@@ -51,4 +51,10 @@ router.post(
   controller.removeArticleImage
 )
 
+router.delete(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  controller.deleteBook
+)
+
 export default router

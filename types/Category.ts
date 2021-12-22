@@ -5,7 +5,7 @@ interface CategoryBasic {
   title: string
   _id: string
   dateCreated: Date
-  relatedBooks: string[]
+  books: string[]
   picture?: string
 }
 

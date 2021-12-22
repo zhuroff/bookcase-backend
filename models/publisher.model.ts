@@ -23,7 +23,7 @@ const publisherSchema = new Schema({
     required: false
   },
 
-  relatedBooks: [
+  books: [
     {
       type: Schema.Types.ObjectId,
       ref: 'book',

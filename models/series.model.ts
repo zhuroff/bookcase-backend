@@ -7,11 +7,6 @@ const seriesSchema = new Schema({
     required: true
   },
 
-  id: {
-    type: Number,
-    required: false
-  },
-
   title: {
     type: String,
     required: true,
@@ -23,17 +18,12 @@ const seriesSchema = new Schema({
     default: Date.now
   },
 
-  books: {
-    type: Array,
-    required: false
-  },
-
   picture: {
     type: String,
     required: false
   },
 
-  relatedBooks: [
+  books: [
     {
       type: Schema.Types.ObjectId,
       ref: 'book',

@@ -7,7 +7,7 @@ import Series from '../models/series.model'
 import List from '../models/list.model'
 
 const bookPopulate = {
-  path: 'relatedBooks',
+  path: 'books',
   model: Book,
   select: [
     '_id',

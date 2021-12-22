@@ -56,7 +56,7 @@ const genresDiagram = async (req: Request, res: Response) => {
   try {
     const response = await Genre.find({ isDraft: false }, { title: true })
       .populate({
-        path: 'relatedBooks',
+        path: 'books',
         select: ['title'],
         match: { 'status.finish': { $ne: null } }
       })

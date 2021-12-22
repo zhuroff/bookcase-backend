@@ -5,7 +5,7 @@ interface BookAuthor {
   role: string
 }
 
-interface BookPublishers {
+interface BookPublisher {
   publisher: Schema.Types.ObjectId
   city: string
   code: string
@@ -30,7 +30,7 @@ interface BookModel {
   authors: BookAuthor[]
   genres: Schema.Types.ObjectId[]
   series: Schema.Types.ObjectId
-  publishers: BookPublishers[]
+  publishers: BookPublisher[]
   format: string
   contents?: string
   coverImage: string | null
@@ -50,5 +50,7 @@ interface BookModel {
 
 export {
   ReadingStatus,
+  BookAuthor,
+  BookPublisher,
   BookModel
 }
