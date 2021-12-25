@@ -37,6 +37,22 @@ const cleanPreCoverField = (id: string) => {
   })
 }
 
+const create = async (req: Request, res: Response) => {
+  const payload = {
+    title: '',
+    isDraft: true
+  }
+
+  const book = new Book(payload)
+
+  try {
+    await book.save()
+    res.status(201).json(book)
+  } catch(error) {
+    res.status(500).json(error)
+  }
+}
+
 const update = async (req: Request, res: Response) => {
   const $set = {
     summary: req.body.summary,
@@ -252,6 +268,7 @@ const deleteBook = async (req: Request, res: Response) => {
 }
 
 const controller = {
+  create,
   update,
   booksList,
   bookItem,

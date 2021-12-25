@@ -11,6 +11,12 @@ router.post(
   controller.booksList
 )
 
+router.post(
+  '/create',
+  passport.authenticate('jwt', { session: false }),
+  controller.create
+)
+
 router.get(
   '/:id',
   passport.authenticate('jwt', { session: false }),
