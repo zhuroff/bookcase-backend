@@ -10,4 +10,10 @@ router.post(
   controller.seriesList
 )
 
+router.post(
+  '/create',
+  passport.authenticate('jwt', { session: false }),
+  controller.create
+)
+
 export default router

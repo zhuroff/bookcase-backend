@@ -55,10 +55,25 @@ const create = async (req: Request, res: Response) => {
 
 const update = async (req: Request, res: Response) => {
   const $set = {
+    isDraft: req.body.isDraft,
+    dateModified: new Date(),
     summary: req.body.summary,
+    contents: req.body.contents,
+    description: req.body.description,
     rating: req.body.rating,
+    title: req.body.title,
+    subtitle: req.body.subtitle,
+    coverType: req.body.coverType,
+    format: req.body.format,
+    series: req.body.series,
+    pages: req.body.pages,
+    publicationYear: req.body.publicationYear,
+    coverImage: req.body.coverImage,
+    preCoverImage: req.body.preCoverImage,
     status: JSON.parse(req.body.status),
-    dateModified: new Date()
+    authors: JSON.parse(req.body.authors),
+    publishers: JSON.parse(req.body.publishers),
+    genres: JSON.parse(req.body.genres)
   }
 
   try {
