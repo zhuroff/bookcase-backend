@@ -11,6 +11,13 @@ router.post(
 )
 
 router.get(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  controller.listFull
+
+)
+
+router.get(
   '/:id/sub',
   passport.authenticate('jwt', { session: false }),
   controller.listShort
