@@ -32,6 +32,7 @@ const seriesSchema = new Schema({
   ]
 })
 
+seriesSchema.index({ title: 'text' })
 seriesSchema.plugin(mongoosePaginate)
 
 export default model('series', seriesSchema)

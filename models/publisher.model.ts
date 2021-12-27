@@ -32,6 +32,7 @@ const publisherSchema = new Schema({
   ]
 })
 
+publisherSchema.index({ title: 'text' })
 publisherSchema.plugin(mongoosePaginate)
 
 export default model('publisher', publisherSchema)

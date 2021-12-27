@@ -32,6 +32,7 @@ const genreSchema = new Schema({
   ]
 })
 
+genreSchema.index({ title: 'text' })
 genreSchema.plugin(mongoosePaginate)
 
 export default model('genre', genreSchema)

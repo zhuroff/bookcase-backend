@@ -50,6 +50,7 @@ const authorSchema = new Schema({
   ]
 })
 
+authorSchema.index({ firstName: 'text', lastName: 'text' })
 authorSchema.plugin(mongoosePaginate)
 
 export default model('author', authorSchema)

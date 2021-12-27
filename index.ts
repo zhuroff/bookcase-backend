@@ -14,6 +14,7 @@ import publisherRoutes from './routes/publisher.routes'
 import genreRoutes from './routes/genre.routes'
 import seriesRoutes from './routes/series.routes'
 import listRoutes from './routes/list.routes'
+import searchRoutes from './routes/search.routes'
 
 dotenv.config()
 
@@ -41,6 +42,7 @@ app.use('/api/publishers', publisherRoutes)
 app.use('/api/genres', genreRoutes)
 app.use('/api/series', seriesRoutes)
 app.use('/api/lists', listRoutes)
+app.use('/api/search', searchRoutes)
 
 app.use('/uploads', express.static(__dirname + '/uploads'))
 

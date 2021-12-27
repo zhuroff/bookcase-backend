@@ -175,6 +175,7 @@ const bookSchema = new Schema({
   ]
 })
 
+bookSchema.index({ title: 'text', subtitle: 'text' })
 bookSchema.plugin(mongoosePaginate)
 
 export default model('book', bookSchema)

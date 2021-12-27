@@ -61,6 +61,7 @@ const listSchema = new Schema({
   ]
 })
 
+listSchema.index({ title: 'text' })
 listSchema.plugin(mongoosePaginate)
 
 export default model('list', listSchema)
