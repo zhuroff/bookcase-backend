@@ -67,6 +67,7 @@ const update = async (req: Request, res: Response) => {
     format: req.body.format,
     series: req.body.series,
     pages: req.body.pages,
+    file: req.body.file,
     publicationYear: req.body.publicationYear,
     coverImage: req.body.coverImage,
     preCoverImage: req.body.preCoverImage,
