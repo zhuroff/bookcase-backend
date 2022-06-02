@@ -12,6 +12,12 @@ router.post(
 )
 
 router.post(
+  '/paper',
+  passport.authenticate('jwt', { session: false }),
+  controller.paperAndEBooks
+)
+
+router.post(
   '/create',
   passport.authenticate('jwt', { session: false }),
   controller.create

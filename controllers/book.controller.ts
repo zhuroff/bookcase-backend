@@ -88,6 +88,35 @@ const update = async (req: Request, res: Response) => {
   }
 }
 
+const paperAndEBooks = async (req: Request, res: Response) => {
+  const booksListPopulates = [
+    { path: 'authors.author', select: ['title', '_id'] }
+  ]
+  const booksListOptions = {
+    page: req.body.page,
+    sort: req.body.sort,
+    limit: req.body.limit,
+    populate: booksListPopulates,
+    select: {
+      title: true,
+      subtitle: true,
+      coverImage: true,
+      file: true,
+      publicationYear: true
+    }
+  }
+  
+  try {
+    const response = await Book.paginate({
+      isDraft: req.body.isDraft,
+      format: { $eq: 'paperbook' }
+    }, booksListOptions)
+    res.json(response)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+}
+
 const booksList = async (req: Request, res: Response) => {
   const booksListPopulates = [
     { path: 'genres', select: ['title', '_id'] },
@@ -286,6 +315,7 @@ const deleteBook = async (req: Request, res: Response) => {
 const controller = {
   create,
   update,
+  paperAndEBooks,
   booksList,
   bookItem,
   setPreCover,
