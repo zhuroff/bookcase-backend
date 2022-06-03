@@ -4,6 +4,7 @@ import Author from '../models/author.model'
 import Genre from '../models/genre.model'
 import Publisher from '../models/publisher.model'
 import Series from '../models/series.model'
+import Book from '../models/book.model'
 
 interface SearchModels {
   [index: string]: PaginateModel<any>
@@ -13,7 +14,8 @@ const searchModels: SearchModels = {
   authors: Author,
   genres: Genre,
   publishers: Publisher,
-  series: Series
+  series: Series,
+  books: Book
 }
 
 const basicOptions = {
@@ -29,8 +31,13 @@ const search = async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await searchModels[req.body.collection].find(params, basicOptions)      
-    res.json(response)
+    const response = req.body.collection
+      ? await searchModels[req.body.collection].find(params, basicOptions)      
+      : await Promise.all(Object.entries(searchModels).map(async ([key, model]) => (
+          { [key]: await model.find(params, basicOptions) }
+        )))
+
+    res.json(response.filter((result) => Object.values(result).flat().length > 0))
   } catch (error) {
     res.status(500).json(error)
   }
