@@ -1,18 +1,18 @@
 import { Router } from 'express'
-import passport from 'passport'
+import { authMiddleware } from '../middleware/auth.middleware'
 import controller from '../controllers/series.controller'
 
 const router = Router()
 
 router.post(
   '/',
-  passport.authenticate('jwt', { session: false }),
+  authMiddleware,
   controller.seriesList
 )
 
 router.post(
   '/create',
-  passport.authenticate('jwt', { session: false }),
+  authMiddleware,
   controller.create
 )
 

@@ -1,10 +1,10 @@
 import { model, Schema } from 'mongoose'
+import { AuthorModel, IAuthor } from '../types/Category'
 import mongoosePaginate from 'mongoose-paginate-v2'
-import { CategoryAuthor } from '../types/Category'
 
-const isRequired = (): boolean => (this as unknown as CategoryAuthor).isDraft
+const isRequired = (): boolean => (this as unknown as AuthorModel).isDraft
 
-const authorSchema = new Schema({
+const AuthorSchema: Schema<AuthorModel> = new Schema({
   isDraft: {
     type: Boolean,
     required: true
@@ -36,11 +36,6 @@ const authorSchema = new Schema({
     index: true
   },
 
-  picture: {
-    type: String,
-    required: false
-  },
-
   books: [
     {
       type: Schema.Types.ObjectId,
@@ -50,7 +45,7 @@ const authorSchema = new Schema({
   ]
 })
 
-authorSchema.index({ firstName: 'text', lastName: 'text' })
-authorSchema.plugin(mongoosePaginate)
+AuthorSchema.index({ firstName: 'text', lastName: 'text' })
+AuthorSchema.plugin(mongoosePaginate)
 
-export default model('author', authorSchema)
+export const Author = model<AuthorModel>('authors', AuthorSchema) as IAuthor<AuthorModel>

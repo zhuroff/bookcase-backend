@@ -9,11 +9,15 @@ const UserSchema = new Schema<UserModel>({
 
   password: {
     type: String,
-    required: true,
-    minLength: 10
+    required: true
   },
 
-  name: {
+  firstName: {
+    type: String,
+    required: false
+  },
+
+  lastName: {
     type: String,
     required: false
   },
@@ -29,4 +33,4 @@ const UserSchema = new Schema<UserModel>({
   }
 })
 
-export default model('user', UserSchema)
+export const User = model<UserModel>('user', UserSchema)

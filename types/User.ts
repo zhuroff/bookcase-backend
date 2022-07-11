@@ -1,17 +1,22 @@
-import { Date } from "mongoose"
+import { UserDTO } from 'dto/user.dto'
+import { Date } from 'mongoose'
 
-interface User {
+type UserModel = {
+  password: string
   email: string
-  name: string
+  firstName: string
+  lastName: string
   role: string
   dateCreated: Date | undefined
 }
 
-interface UserModel extends User {
-  password: string
+type UserResponse = {
+  user: UserDTO;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export {
-  User,
-  UserModel
+  UserModel,
+  UserResponse
 }

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
 import { PaginateModel } from 'mongoose'
-import Author from '../models/author.model'
+import { Author } from '../models/author.model'
 import Genre from '../models/genre.model'
 import Publisher from '../models/publisher.model'
 import Series from '../models/series.model'
-import Book from '../models/book.model'
+import { Book } from '../models/book.model'
 
 interface SearchModels {
   [index: string]: PaginateModel<any>
@@ -20,8 +20,7 @@ const searchModels: SearchModels = {
 
 const basicOptions = {
   _id: true,
-  title: true,
-  dateCreated: true
+  title: true
 }
 
 const search = async (req: Request, res: Response) => {
@@ -32,10 +31,18 @@ const search = async (req: Request, res: Response) => {
 
   try {
     const response = req.body.collection
-      ? await searchModels[req.body.collection].find(params, basicOptions)      
+      ? await searchModels[req.body.collection].find(params, basicOptions)
       : await Promise.all(Object.entries(searchModels).map(async ([key, model]) => (
-          { [key]: await model.find(params, basicOptions) }
-        )))
+        {
+          [key]: key === 'books'
+            ? await model.find(params, { ...basicOptions, subtitle: true })
+              .populate({
+                path: 'authors.author',
+                select: ['title', '_id', 'firstName', 'lastName', 'patronymicName']
+              })
+            : await model.find(params, basicOptions)
+        }
+      )))
 
     res.json(response.filter((result) => Object.values(result).flat().length > 0))
   } catch (error) {

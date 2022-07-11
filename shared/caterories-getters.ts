@@ -1,10 +1,12 @@
 import { Request } from 'express'
 import { Model, PaginateModel } from 'mongoose'
-import Book from '../models/book.model'
+import { Book } from '../models/book.model'
 import Genre from '../models/genre.model'
-import Author from '../models/author.model'
+import { Author } from '../models/author.model'
 import Series from '../models/series.model'
 import List from '../models/list.model'
+import { CategoryItemDTO, CategoryAuthorItemDTO } from '../dto/category.dto'
+import { PaginationDTO } from '../dto/pagination.dto'
 
 const bookPopulate = {
   path: 'books',
@@ -32,13 +34,34 @@ const getCategories = async (req: Request, Model: PaginateModel<any>) => {
     page: req.body.page,
     sort: req.body.sort,
     limit: req.body.limit,
+    lean: true,
     select: {
       title: true,
-      dateCreated: true,
-      isDraft: true
+      isDraft: true,
+      books: true
     }
   }
-  return await Model.paginate({ isDraft: req.body.isDraft }, options)
+
+  if (req.baseUrl.includes('authors')) {
+    options.select = {
+      ...options.select,
+      // @ts-ignore
+      firstName: true,
+      lastName: true,
+      patronymicName: true
+    }
+  }
+
+  const response = await Model.paginate({ isDraft: req.body.isDraft }, options)
+
+  return {
+    docs: response.docs.map((doc) => (
+      req.baseUrl.includes('authors')
+        ? new CategoryAuthorItemDTO(doc)
+        : new CategoryItemDTO(doc)
+    )),
+    pagination: new PaginationDTO(response)
+  }
 }
 
 const getCategory = async (req: Request, fields: object, Model: Model<any, {}, {}>) => {

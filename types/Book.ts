@@ -1,56 +1,46 @@
-import { Schema, Date } from 'mongoose'
+import { PaginateModel, Date, Document } from 'mongoose'
+import { CategoryAuthorExtended, CategoryBasic } from './Category'
 
-interface BookAuthor {
-  author: Schema.Types.ObjectId
-  role: string
-}
-
-interface BookPublisher {
-  publisher: Schema.Types.ObjectId
+export type BookPublisher = {
+  publisher: CategoryBasic
   city: string
   code: string
 }
 
-interface BooksLinks {
+export type BookLinks = {
   url: string
   title: string
 }
 
-interface ReadingStatus {
+export type ReadingStatus = {
   start: Date | null
   finish: Date | null
 }
 
-interface BookModel {
-  _id?: string
+export interface BookModel extends Document {
   isDraft: boolean
   title: string
-  subtitle: string
+  subtitle?: string
   summary?: string
-  authors: BookAuthor[]
-  genres: Schema.Types.ObjectId[]
-  series: Schema.Types.ObjectId
+  authors: CategoryAuthorExtended[]
+  genres: CategoryBasic[]
+  series: CategoryBasic
   publishers: BookPublisher[]
   format: string
   contents?: string
-  coverImage: string | null
-  preCoverImage: string | undefined
+  coverImage?: string
+  preCoverImage?: string
   coverType: string
-  dateCreated: string,
-  dateModified: string,
+  dateCreated?: Date,
+  dateModified?: string
   description?: string
   file?: string
-  links: BooksLinks[]
-  publicationYear: number,
-  pages: number,
+  links: BookLinks[]
+  publicationYear: number
+  pages: number
   rating: number
   status: ReadingStatus
-  lists: Schema.Types.ObjectId[]
+  lists: CategoryBasic[]
 }
 
-export {
-  ReadingStatus,
-  BookAuthor,
-  BookPublisher,
-  BookModel
-}
+export interface IBook<T extends Document> extends PaginateModel<T> { }

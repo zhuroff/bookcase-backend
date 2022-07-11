@@ -2,13 +2,13 @@ import { Request, Response } from 'express'
 import { PaginateModel, Model } from 'mongoose'
 import fs from 'fs'
 import path from 'path'
-import Book from '../models/book.model'
-import Author from '../models/author.model'
+import { Book } from '../models/book.model'
+import { Author } from '../models/author.model'
 import Genre from '../models/genre.model'
 import List from '../models/list.model'
 import Publisher from '../models/publisher.model'
 import Series from '../models/series.model'
-import Users from '../models/user.model'
+import { User } from '../models/user.model'
 
 type BackupModel = {
   [index: string]: PaginateModel<any> | Model<any, {}, {}>
@@ -21,7 +21,7 @@ const backupModels: BackupModel = {
   lists: List,
   publishers: Publisher,
   series: Series,
-  users: Users
+  users: User
 }
 
 const createBackupFolder = (folderName: string) => {

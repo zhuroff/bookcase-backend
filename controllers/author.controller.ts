@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { getCategories } from '../shared/caterories-getters'
-import Author from '../models/author.model'
+import { Author } from '../models/author.model'
 
 const computedTitle = (firstName: string, lastName: string | null, patronymicName: string | null): string => {
   if (lastName) {
@@ -25,7 +25,7 @@ const create = async (req: Request, res: Response) => {
   try {
     await author.save()
     res.status(201).json(author)
-  } catch(error) {
+  } catch (error) {
     res.status(500).json(error)
   }
 }

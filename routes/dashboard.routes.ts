@@ -1,36 +1,36 @@
 import { Router } from 'express'
-import passport from 'passport'
+import { authMiddleware } from '../middleware/auth.middleware'
 import controller from '../controllers/dashboard.controller'
 
 const router = Router()
 
 router.get(
   '/reading-books',
-  passport.authenticate('jwt', { session: false }),
-  controller.readingNow
+  authMiddleware,
+  controller.reading
 )
 
 router.post(
   '/read-books',
-  passport.authenticate('jwt', { session: false }),
-  controller.readCompletely
+  authMiddleware,
+  controller.read
 )
 
 // router.get(
 //   '/admin/genres',
-//   // passport.authenticate('jwt', { session: false }),
+//   authMiddleware,
 //   controller.genresDiagram
 // )
 
 // router.get(
 //   '/admin/types',
-//   // passport.authenticate('jwt', { session: false }),
+//   authMiddleware,
 //   controller.bookTypesDiagram
 // )
 
 // router.get(
 //   '/admin/lists',
-//   // passport.authenticate('jwt', { session: false }),
+//   authMiddleware,
 //   controller.listsProgress
 // )
 

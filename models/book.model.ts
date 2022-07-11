@@ -1,10 +1,10 @@
 import { model, Schema } from 'mongoose'
+import { BookModel, IBook } from '../types/Book'
 import mongoosePaginate from 'mongoose-paginate-v2'
-import { BookModel } from '../types/Book'
 
 const isRequired = (): boolean => (this as unknown as BookModel).isDraft
 
-const bookSchema = new Schema({
+const BookSchema: Schema<BookModel> = new Schema({
   isDraft: {
     type: Boolean,
     required: true
@@ -31,7 +31,7 @@ const bookSchema = new Schema({
     {
       author: {
         type: Schema.Types.ObjectId,
-        ref: 'author',
+        ref: 'authors',
         required: true
       },
 
@@ -175,7 +175,7 @@ const bookSchema = new Schema({
   ]
 })
 
-bookSchema.index({ title: 'text', subtitle: 'text' })
-bookSchema.plugin(mongoosePaginate)
+BookSchema.index({ title: 'text', subtitle: 'text' })
+BookSchema.plugin(mongoosePaginate)
 
-export default model('book', bookSchema)
+export const Book = model<BookModel>('books', BookSchema) as IBook<BookModel>

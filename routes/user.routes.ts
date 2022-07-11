@@ -1,10 +1,23 @@
 import { Router } from 'express'
-// import passport from 'passport'
+import { authValidator } from '../middleware/auth.validator'
 import controller from '../controllers/user.controller'
 
 const router = Router()
 
-router.post('/create', controller.create)
-router.post('/login', controller.login)
+router.post(
+  '/registration',
+  authValidator,
+  controller.registration
+)
+
+router.post(
+  '/login',
+  controller.login
+)
+
+router.get(
+  '/refresh',
+  controller.refresh
+)
 
 export default router

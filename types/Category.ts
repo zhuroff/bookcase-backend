@@ -1,21 +1,35 @@
-import { Date } from 'mongoose'
+import { PaginateModel, Date, Document, Schema } from "mongoose"
 
-interface CategoryBasic {
-  isDraft: boolean
-  title: string
+export type CategoryBasic = {
   _id: string
-  dateCreated: Date
+  title: string
+}
+
+export interface AuthorModel extends Document {
+  isDraft: boolean
+  firstName: string
+  lastName: string
+  patronymicName: string
+  books: Schema.Types.ObjectId[]
+  dateCreated?: Date
+  title: string
+}
+
+export interface IAuthor<T extends Document> extends PaginateModel<T> { }
+
+export type CategoryExtended = CategoryBasic & {
   books: string[]
   picture?: string
 }
 
-interface CategoryAuthor extends CategoryBasic {
-  firstName : string
+export type CategoryAuthor = CategoryBasic & {
+  firstName: string
   lastName: string
   patronymicName: string
 }
 
-export {
-  CategoryBasic,
-  CategoryAuthor
+export type CategoryAuthorExtended = {
+  author: CategoryAuthor
+  role: string
+  _id: string
 }
