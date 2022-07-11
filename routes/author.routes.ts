@@ -7,13 +7,13 @@ const router = Router()
 router.post(
   '/',
   authMiddleware,
-  controller.authorsList
+  controller.list
 )
 
-router.post(
-  '/create',
-  authMiddleware,
-  controller.create
-)
+// router.post(
+//   '/create',
+//   authMiddleware,
+//   controller.create
+// )
 
 export default router

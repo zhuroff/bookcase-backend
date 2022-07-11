@@ -1,6 +1,29 @@
 import { Request, Response } from 'express'
 import { getCategories } from '../shared/caterories-getters'
 import { Author } from '../models/author.model'
+import { CategoryAuthorItemDTO } from '../dto/category.dto'
+import { AuthorModel } from 'types/Category'
+import categoryService from '../services/category.service'
+
+class AuthorController {
+  async list(req: Request, res: Response) {
+    try {
+      const selectExtends = {
+        firstName: true,
+        lastName: true,
+        patronymicName: true
+      }
+      const response = await categoryService.list<AuthorModel>(req, Author, selectExtends)
+
+      res.status(200).json({
+        ...response,
+        docs: response.docs.map((doc) => new CategoryAuthorItemDTO(doc))
+      })
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  }
+}
 
 const computedTitle = (firstName: string, lastName: string | null, patronymicName: string | null): string => {
   if (lastName) {
@@ -44,4 +67,6 @@ const controller = {
   authorsList
 }
 
-export default controller
+console.log(controller)
+
+export default new AuthorController()

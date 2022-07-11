@@ -1,6 +1,6 @@
-import { Document, PaginateResult } from 'mongoose'
+import { PaginateResult } from 'mongoose'
 
-export class PaginationDTO<T extends PaginateResult<Document<{}, {}, T>>> {
+export class PaginationDTO<T extends PaginateResult<any>> {
   page: number | undefined
   totalDocs: number
   totalPages: number

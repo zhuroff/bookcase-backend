@@ -16,7 +16,7 @@ class BookService {
       { path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] }
     ]
 
-    const booksListOptions: IFilter = {
+    const options: IFilter = {
       page: req.body.page || 1,
       sort: sort || req.body.sort,
       limit: req.body.limit || 100,
@@ -33,29 +33,29 @@ class BookService {
       }
     }
 
-    const bookListParams: IFilter = {
+    const params: IFilter = {
       isDraft: req.body.isDraft || false,
       ...filter
     }
 
     if (req.body.unlistedOf) {
-      bookListParams.genres = {
+      params.genres = {
         $elemMatch: { $eq: new Types.ObjectId(req.body.unlistedOf) }
       }
 
-      bookListParams.lists = { $size: 0 }
+      params.lists = { $size: 0 }
     }
 
     if (req.body.paperWithoutFile) {
-      bookListParams.format = { $eq: 'paperbook' }
-      bookListParams.$or = [
+      params.format = { $eq: 'paperbook' }
+      params.$or = [
         { file: { $exists: false } },
         { file: { $eq: null } },
         { file: { $eq: '' } }
       ]
     }
 
-    const response = await Book.paginate(bookListParams, booksListOptions)
+    const response = await Book.paginate(params, options)
 
     return {
       docs: response.docs.map((doc) => new BookItemDTO(doc)),

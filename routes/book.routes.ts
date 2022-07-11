@@ -14,7 +14,7 @@ router.post(
 router.get(
   '/:id',
   authMiddleware,
-  controller.item
+  controller.page
 )
 
 router.post(

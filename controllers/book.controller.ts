@@ -20,7 +20,7 @@ class BookController {
     }
   }
 
-  async item(req: Request, res: Response) {
+  async page(req: Request, res: Response) {
     try {
       const response = await bookService.item(req.params.id)
       res.status(200).json(response)
