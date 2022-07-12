@@ -1,7 +1,10 @@
 import { model, Schema } from 'mongoose'
+import { CategoryModel, ICategory } from '../types/Category'
 import mongoosePaginate from 'mongoose-paginate-v2'
 
-const seriesSchema = new Schema({
+const isRequired = (): boolean => (this as unknown as CategoryModel).isDraft
+
+const SeriesSchema: Schema<CategoryModel> = new Schema({
   isDraft: {
     type: Boolean,
     required: true
@@ -9,7 +12,7 @@ const seriesSchema = new Schema({
 
   title: {
     type: String,
-    required: true,
+    required: isRequired,
     index: true
   },
 
@@ -32,7 +35,7 @@ const seriesSchema = new Schema({
   ]
 })
 
-seriesSchema.index({ title: 'text' })
-seriesSchema.plugin(mongoosePaginate)
+SeriesSchema.index({ title: 'text' })
+SeriesSchema.plugin(mongoosePaginate)
 
-export default model('series', seriesSchema)
+export const Series = model<CategoryModel>('series', SeriesSchema) as ICategory<CategoryModel>

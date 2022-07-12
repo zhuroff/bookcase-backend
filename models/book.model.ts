@@ -45,7 +45,7 @@ const BookSchema: Schema<BookModel> = new Schema({
   genres: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'genre',
+      ref: 'genres',
       required: true
     }
   ],
@@ -60,7 +60,7 @@ const BookSchema: Schema<BookModel> = new Schema({
     {
       publisher: {
         type: Schema.Types.ObjectId,
-        ref: 'publisher',
+        ref: 'publishers',
         required: true
       },
 
@@ -169,7 +169,7 @@ const BookSchema: Schema<BookModel> = new Schema({
   lists: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'list',
+      ref: 'lists',
       required: false
     }
   ]

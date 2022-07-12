@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { getCategories } from '../shared/caterories-getters'
 import { Author } from '../models/author.model'
 import { CategoryAuthorItemDTO } from '../dto/category.dto'
-import { AuthorModel } from 'types/Category'
+import { AuthorModel } from '../types/Category'
 import categoryService from '../services/category.service'
 
 class AuthorController {

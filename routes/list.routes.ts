@@ -7,20 +7,20 @@ const router = Router()
 router.post(
   '/',
   authMiddleware,
-  controller.listsCollections
+  controller.list
 )
 
-router.get(
-  '/:id',
-  authMiddleware,
-  controller.listFull
+// router.get(
+//   '/:id',
+//   authMiddleware,
+//   controller.listFull
 
-)
+// )
 
-router.get(
-  '/:id/sub',
-  authMiddleware,
-  controller.listShort
-)
+// router.get(
+//   '/:id/sub',
+//   authMiddleware,
+//   controller.listShort
+// )
 
 export default router

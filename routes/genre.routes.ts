@@ -7,7 +7,7 @@ const router = Router()
 router.post(
   '/',
   authMiddleware,
-  controller.genresList
+  controller.list
 )
 
 export default router

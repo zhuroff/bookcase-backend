@@ -1,26 +1,21 @@
-import { Book } from './Book'
+import { PaginateModel, Date, Document, Schema } from 'mongoose'
 
-interface BooksSublistContent {
-  _id?: string
+export interface ListSectionContent {
+  item: number
+  book: Schema.Types.ObjectId
   comment: string | null
-  book: Book | string
-  isDeleted?: boolean
 }
 
-interface BooksSublist {
+export interface ListSection {
   title: string
-  _id?: string
-  contents: BooksSublistContent[]
-  isDeleted?: boolean
+  contents: ListSectionContent[]
 }
 
-interface BooksList {
-  dateCreated: Date
-  heroImage: string
+export interface ListModel extends Document {
   isDraft: boolean
   title: string
-  _id: string
-  lists: BooksSublist[]
+  lists: ListSection[]
+  dateCreated?: Date
 }
 
-export { BooksSublistContent, BooksSublist, BooksList }
+export interface IList<T extends Document> extends PaginateModel<T> { }

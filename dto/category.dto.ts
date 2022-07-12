@@ -1,4 +1,4 @@
-import { AuthorModel } from "types/Category"
+import { AuthorModel, CategoryModel } from "types/Category"
 
 export class CategoryItemDTO {
   _id: string
@@ -6,7 +6,7 @@ export class CategoryItemDTO {
   books: number
   isDraft: boolean
 
-  constructor(category: AuthorModel) {
+  constructor(category: CategoryModel) {
     this._id = category._id
     this.title = category.title
     this.books = category.books.length

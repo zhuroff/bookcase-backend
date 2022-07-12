@@ -1,10 +1,10 @@
 import { Request } from 'express'
 import { Model, PaginateModel } from 'mongoose'
 import { Book } from '../models/book.model'
-import Genre from '../models/genre.model'
+import { Genre } from '../models/genre.model'
 import { Author } from '../models/author.model'
-import Series from '../models/series.model'
-import List from '../models/list.model'
+import { Series } from '../models/series.model'
+import { List } from '../models/list.model'
 import { CategoryItemDTO, CategoryAuthorItemDTO } from '../dto/category.dto'
 import { PaginationDTO } from '../dto/pagination.dto'
 

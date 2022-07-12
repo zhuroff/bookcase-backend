@@ -1,11 +1,5 @@
 import { Request, Response } from 'express'
-// import { PaginateModel, Model, ObjectId } from 'mongoose'
-// import { BookModel, BookAuthor, BookPublisher } from '../types/Book'
 import { Book } from '../models/book.model'
-// import { Author } from '../models/author.model'
-// import Publisher from '../models/publisher.model'
-// import Genre from '../models/genre.model'
-// import Series from '../models/series.model'
 import bookService from '../services/book.service'
 import fs from 'fs'
 import path from 'path'
@@ -16,6 +10,7 @@ class BookController {
       const response = await bookService.list(req)
       res.status(200).json(response)
     } catch (error) {
+      console.log(error)
       res.status(500).json(error)
     }
   }

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { ISort, IFilter } from 'types/Common'
 import { Book } from '../models/book.model'
-import Genre from '../models/genre.model'
-import List from '../models/list.model'
+import { Genre } from '../models/genre.model'
+import { List } from '../models/list.model'
 import bookService from '../services/book.service'
 
 // const bookFieldsConfig = {

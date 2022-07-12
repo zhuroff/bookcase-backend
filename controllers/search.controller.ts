@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { PaginateModel } from 'mongoose'
 import { Author } from '../models/author.model'
-import Genre from '../models/genre.model'
-import Publisher from '../models/publisher.model'
-import Series from '../models/series.model'
+import { Genre } from '../models/genre.model'
+import { Publisher } from '../models/publisher.model'
+import { Series } from '../models/series.model'
 import { Book } from '../models/book.model'
 
 interface SearchModels {

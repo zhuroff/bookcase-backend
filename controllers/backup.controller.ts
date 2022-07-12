@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
 import { PaginateModel, Model } from 'mongoose'
-import fs from 'fs'
-import path from 'path'
 import { Book } from '../models/book.model'
 import { Author } from '../models/author.model'
-import Genre from '../models/genre.model'
-import List from '../models/list.model'
-import Publisher from '../models/publisher.model'
-import Series from '../models/series.model'
+import { Genre } from '../models/genre.model'
+import { List } from '../models/list.model'
+import { Publisher } from '../models/publisher.model'
+import { Series } from '../models/series.model'
 import { User } from '../models/user.model'
+import fs from 'fs'
+import path from 'path'
 
 type BackupModel = {
   [index: string]: PaginateModel<any> | Model<any, {}, {}>

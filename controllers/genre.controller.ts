@@ -1,18 +1,22 @@
 import { Request, Response } from 'express'
-import { getCategories } from '../shared/caterories-getters'
-import Genre from '../models/genre.model'
+import { Genre } from '../models/genre.model'
+import { CategoryModel } from '../types/Category'
+import { CategoryItemDTO } from '../dto/category.dto'
+import categoryService from '../services/category.service'
 
-const genresList = async (req: Request, res: Response) => {
-  try {
-    const response = await getCategories(req, Genre)
-    res.json(response)
-  } catch (error) {
-    res.status(500).json(error)
+class GenreController {
+  async list(req: Request, res: Response) {
+    try {
+      const response = await categoryService.list<CategoryModel>(req, Genre)
+
+      res.status(200).json({
+        ...response,
+        docs: response.docs.map((doc) => new CategoryItemDTO(doc))
+      })
+    } catch (error) {
+      res.status(500).json(error)
+    }
   }
 }
 
-const controller = {
-  genresList
-}
-
-export default controller
+export default new GenreController()

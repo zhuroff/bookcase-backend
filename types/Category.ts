@@ -1,4 +1,4 @@
-import { PaginateModel, Date, Document, Schema } from "mongoose"
+import { PaginateModel, Date, Document, Schema } from 'mongoose'
 
 export type CategoryBasic = {
   _id: string
@@ -15,7 +15,17 @@ export interface AuthorModel extends Document {
   title: string
 }
 
+export interface CategoryModel extends Document {
+  isDraft: boolean
+  title: string
+  dateCreated?: Date
+  books: Schema.Types.ObjectId[]
+  picture?: string
+}
+
 export interface IAuthor<T extends Document> extends PaginateModel<T> { }
+
+export interface ICategory<T extends Document> extends PaginateModel<T> { }
 
 export type CategoryExtended = CategoryBasic & {
   books: string[]
