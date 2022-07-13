@@ -29,7 +29,8 @@ class BookService {
         coverImage: true,
         status: true,
         pages: true,
-        publicationYear: true
+        publicationYear: true,
+        accountability: true
       }
     }
 

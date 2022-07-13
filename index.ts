@@ -33,7 +33,7 @@ mongoose.connect(process.env.MONGO_URI as string)
 app.use(cors(corsConfig))
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
-app.use(json())
+app.use(json({ limit: '1000kb' }))
 
 app.use('/api/backup', backupRoutes)
 app.use('/api/users', userRoutes)

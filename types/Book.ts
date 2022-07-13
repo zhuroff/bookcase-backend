@@ -21,6 +21,7 @@ export interface BookModel extends Document {
   isDraft: boolean
   title: string
   subtitle?: string
+  accountability?: boolean
   summary?: string
   authors: CategoryAuthorExtended[]
   genres: CategoryBasic[]

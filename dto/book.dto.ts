@@ -12,6 +12,7 @@ export class BookItemDTO {
   publicationYear: number
   status: ReadingStatus
   subtitle?: string
+  accountability?: boolean
 
   constructor(book: BookModel) {
     this._id = book._id
@@ -24,6 +25,7 @@ export class BookItemDTO {
     this.publicationYear = book.publicationYear
     this.status = book.status
     this.subtitle = book.subtitle
+    this.accountability = book.accountability ?? true
   }
 }
 

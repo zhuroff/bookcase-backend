@@ -16,6 +16,12 @@ const BookSchema: Schema<BookModel> = new Schema({
     index: true
   },
 
+  accountability: {
+    type: Boolean,
+    required: false,
+    default: true
+  },
+
   subtitle: {
     type: String,
     required: false,
