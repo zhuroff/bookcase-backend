@@ -32,6 +32,15 @@ class BookController {
       res.status(500).json(error)
     }
   }
+
+  async remove(req: Request, res: Response) {
+    try {
+      const response = await bookService.remove(req.params.id)
+      res.status(200).json(response)
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  }
 }
 
 interface MulterRequest extends Request {

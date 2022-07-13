@@ -36,24 +36,39 @@ class BookService {
 
     const params: IFilter = {
       isDraft: req.body.isDraft || false,
+      $and: [],
       ...filter
     }
 
     if (req.body.unlistedOf) {
+      params.lists = { $size: 0 }
       params.genres = {
         $elemMatch: { $eq: new Types.ObjectId(req.body.unlistedOf) }
       }
+    }
 
-      params.lists = { $size: 0 }
+    if (req.body.accountableOnly) {
+      params.$and.push({
+        $or: [
+          { accountability: { $exists: false } },
+          { accountability: { $eq: true } }
+        ]
+      })
     }
 
     if (req.body.paperWithoutFile) {
       params.format = { $eq: 'paperbook' }
-      params.$or = [
-        { file: { $exists: false } },
-        { file: { $eq: null } },
-        { file: { $eq: '' } }
-      ]
+      params.$and.push({
+        $or: [
+          { file: { $exists: false } },
+          { file: { $eq: null } },
+          { file: { $eq: '' } }
+        ]
+      })
+    }
+
+    if (!params.$and.length) {
+      delete params.$and
     }
 
     const response = await Book.paginate(params, options)
@@ -90,6 +105,10 @@ class BookService {
 
   async save($set: BookModel, _id: string) {
     return await Book.findOneAndUpdate({ _id }, { $set }, { new: true }) && { isSuccess: true }
+  }
+
+  async remove(_id: string) {
+    return await Book.findOneAndDelete({ _id })
   }
 
   removeMediaFile(filename: string) {

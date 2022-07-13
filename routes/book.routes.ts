@@ -69,10 +69,10 @@ router.post(
 //   controller.removeArticleImage
 // )
 
-// router.delete(
-//   '/:id',
-//   authMiddleware,
-//   controller.deleteBook
-// )
+router.delete(
+  '/:id',
+  authMiddleware,
+  controller.remove
+)
 
 export default router
