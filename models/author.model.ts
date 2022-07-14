@@ -36,6 +36,22 @@ const AuthorSchema: Schema<AuthorModel> = new Schema({
     index: true
   },
 
+  links: [
+    {
+      title: {
+        type: String,
+        required: true
+      },
+
+      url: {
+        type: String,
+        required: true
+      },
+      
+      required: false
+    }
+  ],
+
   books: [
     {
       type: Schema.Types.ObjectId,

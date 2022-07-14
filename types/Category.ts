@@ -1,4 +1,6 @@
 import { PaginateModel, Date, Document, Schema } from 'mongoose'
+import { BookModel } from './Book'
+import { TEntityLink } from './Common'
 
 export type CategoryBasic = {
   _id: string
@@ -10,16 +12,17 @@ export interface AuthorModel extends Document {
   firstName: string
   lastName: string
   patronymicName: string
-  books: Schema.Types.ObjectId[]
+  books: Schema.Types.ObjectId[] | BookModel[]
   dateCreated?: Date
   title: string
+  links: TEntityLink[]
 }
 
 export interface CategoryModel extends Document {
   isDraft: boolean
   title: string
   dateCreated?: Date
-  books: Schema.Types.ObjectId[]
+  books: Schema.Types.ObjectId[] | BookModel[]
   picture?: string
 }
 

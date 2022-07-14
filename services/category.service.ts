@@ -1,5 +1,6 @@
 import { Request } from 'express'
-import { PaginateModel } from 'mongoose'
+import { Model, PaginateModel } from 'mongoose'
+import { Book } from '../models/book.model'
 import { PaginationDTO } from '../dto/pagination.dto'
 
 class CategoryService {
@@ -27,6 +28,23 @@ class CategoryService {
       docs: response.docs,
       pagination: new PaginationDTO(response)
     }
+  }
+
+  async page<T>(req: Request, Model: Model<T, {}, {}>) {
+    const response = await Model.findById(req.params.id)
+      .populate({
+        path: 'books',
+        model: Book,
+        select: ['title', 'subtitle', '_id', 'coverImage', 'status', 'pages', 'publicationYear', 'accountability'],
+        populate: [
+          { path: 'genres', select: ['title', '_id'] },
+          { path: 'lists', select: ['title', '_id'] },
+          { path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] }
+        ]
+      })
+      .lean()
+
+    return response
   }
 }
 

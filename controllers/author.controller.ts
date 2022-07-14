@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
-import { getCategories } from '../shared/caterories-getters'
 import { Author } from '../models/author.model'
-import { CategoryAuthorItemDTO } from '../dto/category.dto'
+import { CategoryAuthorItemDTO, CategoryAuthorPageDTO } from '../dto/category.dto'
 import { AuthorModel } from '../types/Category'
 import categoryService from '../services/category.service'
 
@@ -20,6 +19,20 @@ class AuthorController {
         docs: response.docs.map((doc) => new CategoryAuthorItemDTO(doc))
       })
     } catch (error) {
+      res.status(500).json(error)
+    }
+  }
+
+  async page(req: Request, res: Response) {
+    try {
+      const response = await categoryService.page<AuthorModel>(req, Author)
+
+      if (response) {
+        // @ts-ignore
+        res.status(200).json(new CategoryAuthorPageDTO(response))
+      }
+    } catch (error) {
+      console.log(error)
       res.status(500).json(error)
     }
   }
@@ -53,18 +66,8 @@ const create = async (req: Request, res: Response) => {
   }
 }
 
-const authorsList = async (req: Request, res: Response) => {
-  try {
-    const response = await getCategories(req, Author)
-    res.json(response)
-  } catch (error) {
-    res.status(500).json(error)
-  }
-}
-
 const controller = {
   create,
-  authorsList
 }
 
 console.log(controller)
