@@ -79,7 +79,7 @@ class BookService {
     }
   }
 
-  async item(id: string) {
+  async page(id: string) {
     const book: BookModel = await Book.findById(id)
       .populate({ path: 'genres', select: ['title', '_id'] })
       .populate({ path: 'series', select: ['title', '_id'] })

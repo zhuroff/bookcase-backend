@@ -36,6 +36,16 @@ class AuthorController {
       res.status(500).json(error)
     }
   }
+
+  async update(req: Request, res: Response) {
+    try {
+      const response = await categoryService.update(req, Author)
+      return res.status(201).json(response)
+    } catch (error) {
+      console.log(error)
+      res.status(500).json(error)
+    }
+  }
 }
 
 const computedTitle = (firstName: string, lastName: string | null, patronymicName: string | null): string => {

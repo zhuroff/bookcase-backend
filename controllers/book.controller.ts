@@ -17,9 +17,10 @@ class BookController {
 
   async page(req: Request, res: Response) {
     try {
-      const response = await bookService.item(req.params.id)
+      const response = await bookService.page(req.params.id)
       res.status(200).json(response)
     } catch (error) {
+      console.log(error)
       res.status(500).json(error)
     }
   }

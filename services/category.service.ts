@@ -46,6 +46,15 @@ class CategoryService {
 
     return response
   }
+
+  async update<T>(req: Request, Model: Model<T, {}, {}>) {
+    const query = { _id: req.params.id }
+    const $set = req.body
+
+    await Model.findOneAndUpdate(query, { $set }, { new: true })
+
+    return { isSuccess: true }
+  }
 }
 
 export default new CategoryService()
