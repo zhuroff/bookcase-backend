@@ -10,6 +10,12 @@ router.post(
   controller.list
 )
 
+router.get(
+  '/:id',
+  authMiddleware,
+  controller.page
+)
+
 // router.post(
 //   '/create',
 //   authMiddleware,

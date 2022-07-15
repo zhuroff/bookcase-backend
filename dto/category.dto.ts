@@ -18,6 +18,15 @@ export class CategoryItemDTO {
   }
 }
 
+export class CategoryPageDTO extends CategoryItemDTO {
+  books: BookItemDTO[]
+
+  constructor(category: CategoryModel) {
+    super(category)
+    this.books = (category.books as BookModel[]).map((book) => new BookItemDTO(book))
+  }
+}
+
 export class CategoryAuthorItemDTO extends CategoryItemDTO {
   firstName: string
   lastName?: string

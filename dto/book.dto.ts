@@ -12,6 +12,7 @@ export class BookItemDTO {
   publicationYear: number
   status: ReadingStatus
   subtitle?: string
+  pages: number
   accountability?: boolean
 
   constructor(book: BookModel) {
@@ -25,6 +26,7 @@ export class BookItemDTO {
     this.publicationYear = book.publicationYear
     this.status = book.status
     this.subtitle = book.subtitle
+    this.pages = book.pages
     this.accountability = book.accountability ?? true
   }
 }
@@ -37,7 +39,6 @@ export class BookPageDTO extends BookItemDTO {
   file?: string
   format: string
   links: BookLinks[]
-  pages: number
   preCoverImage?: string
   publishers: BookPublisher[]
   rating: number
@@ -54,7 +55,6 @@ export class BookPageDTO extends BookItemDTO {
     this.file = book.file
     this.format = book.format
     this.links = book.links
-    this.pages = book.pages
     this.preCoverImage = book.preCoverImage
     this.publishers = book.publishers
     this.rating = book.rating
