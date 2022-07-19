@@ -3,13 +3,13 @@ import { BookModel } from '../types/Book'
 import { BookItemDTO } from './book.dto'
 
 export class ListContentItem {
-  _id: string
-  book: BookItemDTO
+  _id?: string
+  book: BookItemDTO | null
   comment: string | null
 
   constructor(content: TListSectionContent) {
     this._id = content._id
-    this.book = new BookItemDTO(content.book as BookModel)
+    this.book = content.book ? new BookItemDTO(content.book as BookModel) : null
     this.comment = content.comment
   }
 }
