@@ -39,7 +39,7 @@ class AuthorController {
 
   async update(req: Request, res: Response) {
     try {
-      const response = await categoryService.update(req, Author)
+      const response = await categoryService.update<AuthorModel>(req, Author)
       return res.status(201).json(response)
     } catch (error) {
       console.log(error)

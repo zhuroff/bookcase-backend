@@ -16,6 +16,12 @@ router.get(
   controller.page
 )
 
+router.patch(
+  '/:id',
+  authMiddleware,
+  controller.update
+)
+
 // router.post(
 //   '/create',
 //   authMiddleware,

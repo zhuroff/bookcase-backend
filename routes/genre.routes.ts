@@ -10,4 +10,16 @@ router.post(
   controller.list
 )
 
+router.get(
+  '/:id',
+  authMiddleware,
+  controller.page
+)
+
+router.patch(
+  '/:id',
+  authMiddleware,
+  controller.update
+)
+
 export default router

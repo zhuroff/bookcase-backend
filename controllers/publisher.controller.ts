@@ -31,6 +31,16 @@ class PublisherController {
       res.status(500).json(error)
     }
   }
+
+  async update(req: Request, res: Response) {
+    try {
+      const response = await categoryService.update<CategoryModel>(req, Publisher)
+      return res.status(201).json(response)
+    } catch (error) {
+      console.log(error)
+      res.status(500).json(error)
+    }
+  }
 }
 
 // const create = async (req: Request, res: Response) => {
