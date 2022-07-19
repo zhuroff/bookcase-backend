@@ -1,19 +1,22 @@
 import { Request, Response } from 'express'
-import { List } from '../models/list.model'
-import { ListModel } from '../types/List'
-// import { CategoryItemDTO } from '../dto/category.dto'
-import categoryService from '../services/category.service'
+import listService from '../services/list.service'
 
 class ListController {
   async list(req: Request, res: Response) {
     try {
-      const response = await categoryService.list<ListModel>(req, List)
-
-      res.status(200).json({
-        ...response,
-        docs: response.docs // response.docs.map((doc) => new CategoryItemDTO(doc))
-      })
+      const response = await listService.list()
+      res.status(200).json(response)
     } catch (error) {
+      res.status(500).json(error)
+    }
+  }
+
+  async page(req: Request, res: Response) {
+    try {
+      const response = await listService.page(req)
+      res.status(200).json(response)
+    } catch (error) {
+      console.log(error)
       res.status(500).json(error)
     }
   }

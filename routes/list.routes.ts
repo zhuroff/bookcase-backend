@@ -4,18 +4,17 @@ import controller from '../controllers/list.controller'
 
 const router = Router()
 
-router.post(
+router.get(
   '/',
   authMiddleware,
   controller.list
 )
 
-// router.get(
-//   '/:id',
-//   authMiddleware,
-//   controller.listFull
-
-// )
+router.get(
+  '/:id',
+  authMiddleware,
+  controller.page
+)
 
 // router.get(
 //   '/:id/sub',

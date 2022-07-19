@@ -1,20 +1,22 @@
 import { PaginateModel, Date, Document, Schema } from 'mongoose'
+import { BookModel } from './Book'
 
-export interface ListSectionContent {
-  item: number
-  book: Schema.Types.ObjectId
+export type TListSectionContent = {
+  _id: string
+  book: Schema.Types.ObjectId | BookModel
   comment: string | null
 }
 
-export interface ListSection {
+export type TListSection = {
+  _id: string
   title: string
-  contents: ListSectionContent[]
+  contents: TListSectionContent[]
 }
 
 export interface ListModel extends Document {
   isDraft: boolean
   title: string
-  lists: ListSection[]
+  lists: TListSection[]
   dateCreated?: Date
 }
 
