@@ -1,4 +1,4 @@
-import { PaginateModel, Date, Document, Schema } from 'mongoose'
+import { PaginateModel, Date, Document, Schema, Types } from 'mongoose'
 import { BookModel } from './Book'
 import { TEntityLink } from './Common'
 
@@ -42,7 +42,7 @@ export type CategoryAuthor = CategoryBasic & {
 }
 
 export type CategoryAuthorExtended = {
-  author: CategoryAuthor
+  author: CategoryAuthor | Types.ObjectId
   role: string
   _id: string
 }

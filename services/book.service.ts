@@ -2,6 +2,7 @@ import { Request } from 'express'
 import { Types } from 'mongoose'
 import { BookModel } from '../types/Book'
 import { Book } from '../models/book.model'
+import { Author } from '../models/author.model'
 import { ISort, IFilter } from 'types/Common'
 import { BookItemDTO, BookPageDTO } from '../dto/book.dto'
 import { PaginationDTO } from '../dto/pagination.dto'
@@ -108,7 +109,20 @@ class BookService {
   }
 
   async remove(_id: string) {
-    return await Book.findOneAndDelete({ _id })
+    const response = await Book.findById(_id).lean()
+    console.log(response)
+    
+    if (response?.authors?.length) {
+      response.authors.map(async ({ author }) => (
+        await Author.findOneAndUpdate(
+          { _id: author },
+          { $pull: { books: new Types.ObjectId(_id) } },
+          { new: true })
+      ))
+    }
+
+    return { success: true }
+    // return await Book.findOneAndDelete({ _id })
   }
 
   removeMediaFile(filename: string) {

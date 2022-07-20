@@ -18,7 +18,7 @@ export class BookItemDTO {
   constructor(book: BookModel) {
     this._id = book._id
     this.title = book.title
-    this.authors = book.authors.map(({ author }) => author)
+    this.authors = book.authors.map(({ author }) => author as CategoryAuthor)
     this.coverImage = book.coverImage
     this.genres = book.genres
     this.isDraft = book.isDraft
