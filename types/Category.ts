@@ -1,10 +1,12 @@
-import { PaginateModel, Date, Document, Schema, Types } from 'mongoose'
+import { PaginateModel, Date, Document, PopulatedDoc } from 'mongoose'
 import { BookModel } from './Book'
 import { TEntityLink } from './Common'
 
-export type CategoryBasic = {
-  _id: string
+export interface CategoryModel extends Document {
+  isDraft: boolean
   title: string
+  dateCreated?: Date
+  books: PopulatedDoc<BookModel>[]
 }
 
 export interface AuthorModel extends Document {
@@ -12,37 +14,28 @@ export interface AuthorModel extends Document {
   firstName: string
   lastName: string
   patronymicName: string
-  books: Schema.Types.ObjectId[] | BookModel[]
+  books: PopulatedDoc<BookModel>[]
   dateCreated?: Date
   title: string
   links: TEntityLink[]
 }
 
-export interface CategoryModel extends Document {
-  isDraft: boolean
-  title: string
-  dateCreated?: Date
-  books: Schema.Types.ObjectId[] | BookModel[]
-  picture?: string
-}
+export interface ICategory<T extends Document> extends PaginateModel<T> { }
 
 export interface IAuthor<T extends Document> extends PaginateModel<T> { }
 
-export interface ICategory<T extends Document> extends PaginateModel<T> { }
-
-export type CategoryExtended = CategoryBasic & {
-  books: string[]
-  picture?: string
-}
-
-export type CategoryAuthor = CategoryBasic & {
-  firstName: string
-  lastName: string
-  patronymicName: string
-}
-
-export type CategoryAuthorExtended = {
-  author: CategoryAuthor | Types.ObjectId
+export type AuthorBookPage = Document & {
+  author: PopulatedDoc<AuthorModel>
   role: string
+}
+
+export type PublisherBookPage = {
+  publisher: PopulatedDoc<CategoryModel>
+  city?: string
+  code?: string
+}
+
+export type CategoryBasic = {
   _id: string
+  title: string
 }

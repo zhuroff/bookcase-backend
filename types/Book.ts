@@ -1,15 +1,13 @@
-import { PaginateModel, Date, Document } from 'mongoose'
-import { CategoryAuthorExtended, CategoryBasic } from './Category'
+import { PaginateModel, PopulatedDoc, Date, Document, Types } from 'mongoose'
+import { AuthorBookPage, CategoryModel, PublisherBookPage } from './Category'
+import { ListModel } from './List'
 
-export type BookPublisher = {
-  publisher: CategoryBasic
-  city: string
-  code: string
-}
+// https://mongoosejs.com/docs/typescript/populate.html
 
 export type BookLinks = {
   url: string
   title: string
+  _id: Types.ObjectId
 }
 
 export type ReadingStatus = {
@@ -21,12 +19,11 @@ export interface BookModel extends Document {
   isDraft: boolean
   title: string
   subtitle?: string
-  accountability?: boolean
   summary?: string
-  authors: CategoryAuthorExtended[]
-  genres: CategoryBasic[]
-  series: CategoryBasic
-  publishers: BookPublisher[]
+  authors: AuthorBookPage[]
+  genres: PopulatedDoc<CategoryModel>[]
+  series: PopulatedDoc<CategoryModel>
+  publishers: PublisherBookPage[]
   format: string
   contents?: string
   coverImage?: string
@@ -34,14 +31,15 @@ export interface BookModel extends Document {
   coverType: string
   dateCreated?: Date,
   dateModified?: string
-  description?: string
+  description: string
   file?: string
-  links: BookLinks[]
+  links?: BookLinks[]
   publicationYear: number
   pages: number
-  rating: number
+  rating?: number
   status: ReadingStatus
-  lists: CategoryBasic[]
+  lists: PopulatedDoc<ListModel>[]
+  accountability?: boolean
 }
 
 export interface IBook<T extends Document> extends PaginateModel<T> { }

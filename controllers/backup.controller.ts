@@ -77,7 +77,7 @@ const backupSave = async (req: Request, res: Response) => {
 
     const backupProcess = Object.keys(backupModels).map(async (el: string) => {
       const Model = backupModels[el]
-      const response = await Model.find({}).lean()
+      const response = await Model?.find({}).lean()
 
       return await writeBackupFile(`${el}.json`, timestamp, response)
     })
@@ -90,38 +90,46 @@ const backupSave = async (req: Request, res: Response) => {
 }
 
 const backupRestore = async (req: Request, res: Response) => {
-  const folderName = req.params.date
+  const folderName = req.params['date']
 
   try {
-    const restoreProcess = Object.keys(backupModels).map(async (el: string) => {
-      const Model = backupModels[el]
-      const fileContent: any = await readBackupFile(folderName, `${el}.json`)
+    if (folderName) {
+      const restoreProcess = Object.keys(backupModels).map(async (el: string) => {
+        const Model = backupModels[el]
+        const fileContent: any = await readBackupFile(folderName, `${el}.json`)
 
-      await Model.deleteMany({})
-      await Model.insertMany(fileContent)
+        await Model?.deleteMany({})
+        await Model?.insertMany(fileContent)
 
-      return el
-    })
+        return el
+      })
 
-    await Promise.all(restoreProcess)
-    res.json({ message: 'Data restore completed successfully' })
+      await Promise.all(restoreProcess)
+      res.json({ message: 'Data restore completed successfully' })
+    } else {
+      throw new Error('Folder does not exist')
+    }
   } catch (error) {
     res.status(500).json(error)
   }
 }
 
 const backupDelete = (req: Request, res: Response) => {
-  const folderName = req.params.date
+  const folderName = req.params['date']
 
   try {
-    fs.rm(
-      path.join(__dirname, '../backups', folderName),
-      { recursive: true },
-      (error) => {
-        if (error) throw new Error(error.message || 'Something went wrong')
-        res.json({ message: 'Backup was successfully deleted' })
-      }
-    )
+    if (folderName) {
+      fs.rm(
+        path.join(__dirname, '../backups', folderName),
+        { recursive: true },
+        (error) => {
+          if (error) throw new Error(error.message || 'Something went wrong')
+          res.json({ message: 'Backup was successfully deleted' })
+        }
+      )
+    } else {
+      throw new Error('Folder does not exist')
+    }
   } catch (error) {
     console.log(error)
     res.status(500).json(error)

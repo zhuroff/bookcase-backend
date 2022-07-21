@@ -7,12 +7,12 @@ const filenameSlugify = (filename: string): string => {
 }
 
 const storage = multer.diskStorage({
-  destination (req: Request, file: any, callback: any) {
-    const folder = req.query.folder as string
+  destination(req: Request, file: any, callback: any) {
+    const folder = req.query['folder'] as string
     callback(null, path.resolve(__dirname, '../', 'uploads', folder))
   },
 
-  filename (req: Request, file: any, callback: any) {
+  filename(req: Request, file: any, callback: any) {
     callback(null, `${new Date().getTime()}-${filenameSlugify(file.originalname)}`)
   }
 })

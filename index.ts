@@ -26,7 +26,7 @@ const corsConfig = {
     : process.env['CLIENT_URL_PROD']
 }
 
-mongoose.connect(process.env.MONGO_URI as string)
+mongoose.connect(process.env['MONGO_URI'] as string)
   .then(() => console.log('MongoDB connected'))
   .catch((error) => console.log(error))
 

@@ -21,11 +21,6 @@ const SeriesSchema: Schema<CategoryModel> = new Schema({
     default: Date.now
   },
 
-  picture: {
-    type: String,
-    required: false
-  },
-
   books: [
     {
       type: Schema.Types.ObjectId,

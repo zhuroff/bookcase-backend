@@ -6,17 +6,13 @@ import { Publisher } from '../models/publisher.model'
 import { Series } from '../models/series.model'
 import { Book } from '../models/book.model'
 
-interface SearchModels {
-  [index: string]: PaginateModel<any>
-}
-
-const searchModels: SearchModels = {
-  authors: Author,
-  genres: Genre,
-  publishers: Publisher,
-  series: Series,
-  books: Book
-}
+const searchModels = new Map<string, PaginateModel<any>>([
+  ['authors', Author],
+  ['genres', Genre],
+  ['publishers', Publisher],
+  ['series', Series],
+  ['books', Book]
+])
 
 const basicOptions = {
   _id: true,
@@ -31,8 +27,8 @@ const search = async (req: Request, res: Response) => {
 
   try {
     const response = req.body.collection
-      ? await searchModels[req.body.collection].find(params, basicOptions)
-      : await Promise.all(Object.entries(searchModels).map(async ([key, model]) => (
+      ? await searchModels.get(req.body.collection)?.find(params, basicOptions)
+      : await Promise.all(Array.from(searchModels).map(async ([key, model]) => (
         {
           [key]: key === 'books'
             ? await model.find(params, { ...basicOptions, subtitle: true })
@@ -44,7 +40,11 @@ const search = async (req: Request, res: Response) => {
         }
       )))
 
-    res.json(response.filter((result) => Object.values(result).flat().length > 0))
+    if (response) {
+      res.json(response.filter((result) => Object.values(result).flat().length > 0))
+    } else {
+      throw new Error('Nothing was found: Request error')
+    }
   } catch (error) {
     res.status(500).json(error)
   }

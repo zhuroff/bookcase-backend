@@ -1,14 +1,15 @@
-import { CategoryAuthor, CategoryBasic, CategoryAuthorExtended } from 'types/Category'
-import { BookModel, BookLinks, BookPublisher, ReadingStatus } from '../types/Book'
+import { CategoryBasic, AuthorBookPage, PublisherBookPage, AuthorModel } from 'types/Category'
+import { ListModel } from 'types/List'
+import { BookModel, BookLinks, ReadingStatus } from '../types/Book'
 
-export class BookItemDTO {
+export class BookItemDTO<T = Partial<AuthorModel>> {
   _id: string
   title: string
-  authors: CategoryAuthor[] | CategoryAuthorExtended[]
+  authors: T[]
   coverImage?: string
   genres: CategoryBasic[]
   isDraft: boolean
-  lists: CategoryBasic[]
+  lists: CategoryBasic[] | ListModel[]
   publicationYear: number
   status: ReadingStatus
   subtitle?: string
@@ -18,7 +19,7 @@ export class BookItemDTO {
   constructor(book: BookModel) {
     this._id = book._id
     this.title = book.title
-    this.authors = book.authors.map(({ author }) => author as CategoryAuthor)
+    this.authors = book.authors.map(({ author }) => author)
     this.coverImage = book.coverImage
     this.genres = book.genres
     this.isDraft = book.isDraft
@@ -31,17 +32,17 @@ export class BookItemDTO {
   }
 }
 
-export class BookPageDTO extends BookItemDTO {
-  authors: CategoryAuthorExtended[]
+export class BookPageDTO extends BookItemDTO<AuthorBookPage> {
+  authors: AuthorBookPage[]
   contents?: string
   coverType: string
   description?: string
   file?: string
   format: string
-  links: BookLinks[]
+  links?: BookLinks[]
   preCoverImage?: string
-  publishers: BookPublisher[]
-  rating: number
+  publishers: PublisherBookPage[]
+  rating?: number
   series?: CategoryBasic
   status: ReadingStatus
   summary?: string

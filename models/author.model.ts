@@ -47,7 +47,7 @@ const AuthorSchema: Schema<AuthorModel> = new Schema({
         type: String,
         required: true
       },
-      
+
       required: false
     }
   ],

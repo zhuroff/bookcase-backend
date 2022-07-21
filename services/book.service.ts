@@ -3,6 +3,9 @@ import { Types } from 'mongoose'
 import { BookModel } from '../types/Book'
 import { Book } from '../models/book.model'
 import { Author } from '../models/author.model'
+import { Genre } from '../models/genre.model'
+import { Publisher } from '../models/publisher.model'
+import { Series } from '../models/series.model'
 import { ISort, IFilter } from 'types/Common'
 import { BookItemDTO, BookPageDTO } from '../dto/book.dto'
 import { PaginationDTO } from '../dto/pagination.dto'
@@ -42,14 +45,14 @@ class BookService {
     }
 
     if (req.body.unlistedOf) {
-      params.lists = { $size: 0 }
-      params.genres = {
+      params['lists'] = { $size: 0 }
+      params['genres'] = {
         $elemMatch: { $eq: new Types.ObjectId(req.body.unlistedOf) }
       }
     }
 
     if (req.body.accountableOnly) {
-      params.$and.push({
+      params['$and'].push({
         $or: [
           { accountability: { $exists: false } },
           { accountability: { $eq: true } }
@@ -58,8 +61,8 @@ class BookService {
     }
 
     if (req.body.paperWithoutFile) {
-      params.format = { $eq: 'paperbook' }
-      params.$and.push({
+      params['format'] = { $eq: 'paperbook' }
+      params['$and'].push({
         $or: [
           { file: { $exists: false } },
           { file: { $eq: null } },
@@ -68,8 +71,8 @@ class BookService {
       })
     }
 
-    if (!params.$and.length) {
-      delete params.$and
+    if (!params['$and'].length) {
+      delete params['$and']
     }
 
     const response = await Book.paginate(params, options)
@@ -80,11 +83,13 @@ class BookService {
     }
   }
 
-  async page(id: string) {
+  async page(id?: string) {
+    if (!id) throw new Error('Param \'id\' is not defined')
+
     const book: BookModel = await Book.findById(id)
       .populate({ path: 'genres', select: ['title', '_id'] })
       .populate({ path: 'series', select: ['title', '_id'] })
-      .populate({ path: 'lists', select: ['title', '_id'] })
+      .populate({ path: 'lists', select: ['title', '_id', 'lists'] })
       .populate({ path: 'authors.author', select: ['title', '_id'] })
       .populate({ path: 'publishers.publisher', select: ['title', '_id'] })
       .lean()
@@ -104,25 +109,53 @@ class BookService {
     return new BookPageDTO(book)
   }
 
-  async save($set: BookModel, _id: string) {
+  async save($set: BookModel, _id?: string) {
+    if (!_id) throw new Error('Param \'id\' is not defined')
     return await Book.findOneAndUpdate({ _id }, { $set }, { new: true }) && { isSuccess: true }
   }
 
-  async remove(_id: string) {
-    const response = await Book.findById(_id).lean()
-    console.log(response)
-    
+  async remove(_id?: string) {
+    if (!_id) throw new Error('Param \'id\' is not defined')
+
+    const response = await Book.findById(_id)//.lean()
+
     if (response?.authors?.length) {
       response.authors.map(async ({ author }) => (
         await Author.findOneAndUpdate(
           { _id: author },
           { $pull: { books: new Types.ObjectId(_id) } },
+          { new: true }
+        )
+      ))
+    }
+
+    if (response?.genres?.length) {
+      response.genres.map(async (genre) => (
+        await Genre.findOneAndUpdate(
+          { _id: genre },
+          { $pull: { books: new Types.ObjectId(_id) } },
           { new: true })
       ))
     }
 
-    return { success: true }
-    // return await Book.findOneAndDelete({ _id })
+    if (response?.publishers?.length) {
+      response.publishers.map(async ({ publisher }) => (
+        await Publisher.findOneAndUpdate(
+          { _id: publisher },
+          { $pull: { books: new Types.ObjectId(_id) } },
+          { new: true })
+      ))
+    }
+
+    if (response?.series) {
+      await Series.findOneAndUpdate(
+        { _id: response.series },
+        { $pull: { books: new Types.ObjectId(_id) } },
+        { new: true }
+      )
+    }
+
+    return await Book.findOneAndDelete({ _id })
   }
 
   removeMediaFile(filename: string) {

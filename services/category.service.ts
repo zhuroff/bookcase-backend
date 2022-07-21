@@ -31,7 +31,7 @@ class CategoryService {
   }
 
   async page<T>(req: Request, Model: Model<T, {}, {}>) {
-    const response = await Model.findById(req.params.id)
+    const response = await Model.findById(req.params['id'])
       .populate({
         path: 'books',
         model: Book,
@@ -48,7 +48,7 @@ class CategoryService {
   }
 
   async update<T>(req: Request, Model: Model<T, {}, {}>) {
-    const query = { _id: req.params.id }
+    const query = { _id: req.params['id'] }
     const $set = req.body
 
     await Model.findOneAndUpdate(query, { $set }, { new: true })

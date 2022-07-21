@@ -16,12 +16,6 @@ const BookSchema: Schema<BookModel> = new Schema({
     index: true
   },
 
-  accountability: {
-    type: Boolean,
-    required: false,
-    default: true
-  },
-
   subtitle: {
     type: String,
     required: false,
@@ -94,11 +88,12 @@ const BookSchema: Schema<BookModel> = new Schema({
 
   coverImage: {
     type: String,
-    required: isRequired
+    required: false
   },
 
   preCoverImage: {
     type: String,
+    required: false,
     default: ''
   },
 
@@ -178,7 +173,13 @@ const BookSchema: Schema<BookModel> = new Schema({
       ref: 'lists',
       required: false
     }
-  ]
+  ],
+
+  accountability: {
+    type: Boolean,
+    required: false,
+    default: true
+  },
 })
 
 BookSchema.index({ title: 'text', subtitle: 'text' })

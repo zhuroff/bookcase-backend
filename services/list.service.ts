@@ -16,7 +16,7 @@ class ListService {
   }
 
   async page(req: Request) {
-    const response = await List.findById(req.params.id)
+    const response = await List.findById(req.params['id'])
       .populate({
         path: 'lists.contents.book',
         model: Book,
@@ -27,7 +27,7 @@ class ListService {
           { path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] }
         ]
       })
-    
+
     if (response) {
       return new ListPageDTO(response)
     }
@@ -36,7 +36,7 @@ class ListService {
   }
 
   async update(req: Request) {
-    const query = { _id: req.params.id }
+    const query = { _id: req.params['id'] }
     const $set = req.body
 
     await List.findOneAndUpdate(query, { $set }, { new: true })

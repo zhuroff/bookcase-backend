@@ -11,11 +11,12 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "noUncheckedIndexedAccess": false,
-    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": true,
     "baseUrl": ".",
     "types": [
-      "@types/node"
+      "@types/node",
+      "./types"
     ],
     "esModuleInterop": true,
     "skipLibCheck": true,
