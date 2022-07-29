@@ -4,12 +4,12 @@ import { BookItemDTO } from './book.dto'
 
 export class ListContentItem {
   _id?: string
-  book: BookItemDTO | null
+  book: BookItemDTO
   comment: string | null
 
   constructor(content: TListSectionContent) {
     this._id = content._id
-    this.book = content.book ? new BookItemDTO(content.book as BookModel) : null
+    this.book = new BookItemDTO(content.book as BookModel)
     this.comment = content.comment
   }
 }
@@ -38,11 +38,15 @@ export class ListPageDTO {
     this._id = list._id
     this.title = list.title
     this.isDraft = list.isDraft
-    // @ts-ignore
     this.lists = list.lists.map((list) => ({
       _id: list._id,
       title: list.title,
-      content: list.contents.map((content) => new ListContentItem(content))
+      contents: (list.contents as TListSectionContent[]).reduce((acc, next) => {
+        if (next.book) {
+          acc.push(new ListContentItem(next))
+        }
+        return acc
+      }, [] as ListContentItem[])
     }))
   }
 }

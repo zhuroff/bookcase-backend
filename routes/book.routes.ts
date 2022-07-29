@@ -17,10 +17,10 @@ router.get(
   controller.page
 )
 
-router.post(
+router.patch(
   '/:id',
   authMiddleware,
-  controller.save
+  controller.update
 )
 
 // router.post(

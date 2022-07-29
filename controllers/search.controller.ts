@@ -4,6 +4,7 @@ import { Author } from '../models/author.model'
 import { Genre } from '../models/genre.model'
 import { Publisher } from '../models/publisher.model'
 import { Series } from '../models/series.model'
+import { List } from '../models/list.model'
 import { Book } from '../models/book.model'
 
 const searchModels = new Map<string, PaginateModel<any>>([
@@ -11,6 +12,7 @@ const searchModels = new Map<string, PaginateModel<any>>([
   ['genres', Genre],
   ['publishers', Publisher],
   ['series', Series],
+  ['lists', List],
   ['books', Book]
 ])
 

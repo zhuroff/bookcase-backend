@@ -38,7 +38,7 @@ class CategoryService {
         select: ['title', 'subtitle', '_id', 'coverImage', 'status', 'pages', 'publicationYear', 'accountability'],
         populate: [
           { path: 'genres', select: ['title', '_id'] },
-          { path: 'lists', select: ['title', '_id'] },
+          { path: 'lists', select: ['title', '_id', 'lists'] },
           { path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] }
         ]
       })

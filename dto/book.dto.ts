@@ -1,5 +1,5 @@
 import { CategoryBasic, AuthorBookPage, PublisherBookPage, AuthorModel } from 'types/Category'
-import { ListModel } from 'types/List'
+import { ListModel, TListSection } from 'types/List'
 import { BookModel, BookLinks, ReadingStatus } from '../types/Book'
 
 export class BookItemDTO<T = Partial<AuthorModel>> {
@@ -9,7 +9,7 @@ export class BookItemDTO<T = Partial<AuthorModel>> {
   coverImage?: string
   genres: CategoryBasic[]
   isDraft: boolean
-  lists: CategoryBasic[] | ListModel[]
+  lists: ListModel[]
   publicationYear: number
   status: ReadingStatus
   subtitle?: string
@@ -23,7 +23,22 @@ export class BookItemDTO<T = Partial<AuthorModel>> {
     this.coverImage = book.coverImage
     this.genres = book.genres
     this.isDraft = book.isDraft
-    this.lists = book.lists
+    this.lists = !book.lists?.length ? [] : book.lists.map((list) => ({
+      ...list,
+      lists: list.lists.reduce((acc: any[], next: any) => {
+        const matched = next.contents.filter((item: any) => (
+          item.book.toString() === book._id.toString()
+        ))
+
+        if (matched.length) {
+          acc.push({
+            _id: next._id,
+            title: next.title
+          })
+        }
+        return acc
+      }, [] as TListSection[])
+    }))
     this.publicationYear = book.publicationYear
     this.status = book.status
     this.subtitle = book.subtitle

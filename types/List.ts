@@ -1,16 +1,17 @@
-import { PaginateModel, Date, Document, Schema } from 'mongoose'
+import { ListContentItem } from 'dto/list.dto'
+import { PaginateModel, Date, Document, PopulatedDoc } from 'mongoose'
 import { BookModel } from './Book'
 
 export type TListSectionContent = {
   _id: string
-  book: Schema.Types.ObjectId | BookModel
+  book: PopulatedDoc<BookModel>
   comment: string | null
 }
 
 export type TListSection = {
   _id: string
   title: string
-  contents: TListSectionContent[]
+  contents: TListSectionContent[] | ListContentItem[]
 }
 
 export interface ListModel extends Document {

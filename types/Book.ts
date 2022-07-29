@@ -2,8 +2,6 @@ import { PaginateModel, PopulatedDoc, Date, Document, Types } from 'mongoose'
 import { AuthorBookPage, CategoryModel, PublisherBookPage } from './Category'
 import { ListModel } from './List'
 
-// https://mongoosejs.com/docs/typescript/populate.html
-
 export type BookLinks = {
   url: string
   title: string

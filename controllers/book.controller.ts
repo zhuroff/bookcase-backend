@@ -25,9 +25,9 @@ class BookController {
     }
   }
 
-  async save(req: Request, res: Response) {
+  async update(req: Request, res: Response) {
     try {
-      const response = await bookService.save(req.body, req.params['id'])
+      const response = await bookService.update(req.body, req.params['id'])
       res.status(200).json(response)
     } catch (error) {
       res.status(500).json(error)
@@ -39,6 +39,7 @@ class BookController {
       const response = await bookService.remove(req.params['id'])
       res.status(200).json(response)
     } catch (error) {
+      console.log(error)
       res.status(500).json(error)
     }
   }

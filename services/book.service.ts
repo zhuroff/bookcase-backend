@@ -1,11 +1,13 @@
 import { Request } from 'express'
 import { Types } from 'mongoose'
 import { BookModel } from '../types/Book'
+import { TListSection, TListSectionContent } from '../types/List'
 import { Book } from '../models/book.model'
 import { Author } from '../models/author.model'
 import { Genre } from '../models/genre.model'
 import { Publisher } from '../models/publisher.model'
 import { Series } from '../models/series.model'
+import { List } from '../models/list.model'
 import { ISort, IFilter } from 'types/Common'
 import { BookItemDTO, BookPageDTO } from '../dto/book.dto'
 import { PaginationDTO } from '../dto/pagination.dto'
@@ -16,7 +18,7 @@ class BookService {
   async list(req: Request, filter: IFilter = {}, sort?: ISort) {
     const booksListPopulates = [
       { path: 'genres', select: ['title', '_id'] },
-      { path: 'lists', select: ['title', '_id'] },
+      { path: 'lists', select: ['title', '_id', 'lists'] },
       { path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] }
     ]
 
@@ -109,15 +111,17 @@ class BookService {
     return new BookPageDTO(book)
   }
 
-  async save($set: BookModel, _id?: string) {
+  async update($set: Partial<BookModel>, _id?: string) {
     if (!_id) throw new Error('Param \'id\' is not defined')
-    return await Book.findOneAndUpdate({ _id }, { $set }, { new: true }) && { isSuccess: true }
+    // TODO: Update all pupulate models
+    return Promise.resolve({ isSuccess: true })
+    // return await Book.findOneAndUpdate({ _id }, { $set }, { new: true }) && { isSuccess: true }
   }
 
   async remove(_id?: string) {
     if (!_id) throw new Error('Param \'id\' is not defined')
 
-    const response = await Book.findById(_id)//.lean()
+    const response = await Book.findById(_id)
 
     if (response?.authors?.length) {
       response.authors.map(async ({ author }) => (
@@ -145,6 +149,31 @@ class BookService {
           { $pull: { books: new Types.ObjectId(_id) } },
           { new: true })
       ))
+    }
+
+    if (response?.lists?.length) {
+      response.lists.map(async (list) => {
+        const doc = await List.findOne({ _id: list }).lean()
+
+        if (doc) {
+          const clearedLists: TListSection[] = doc.lists.map((list) => {
+            const deletedBookIndex = (list.contents as TListSectionContent[])
+              .findIndex((content) => content.book.toString() === _id)
+
+            if (deletedBookIndex > -1) {
+              list.contents.splice(deletedBookIndex, 1)
+            }
+
+            return list
+          })
+
+          await List.findOneAndUpdate(
+            { _id: doc._id },
+            { $set: { lists: clearedLists } },
+            { new: true }
+          )
+        }
+      })
     }
 
     if (response?.series) {

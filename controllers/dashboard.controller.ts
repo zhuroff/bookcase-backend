@@ -56,7 +56,7 @@ class DashboardController {
 //   try {
 //     const response = await Book.find(filter, bookFieldsConfig)
 //       .populate({ path: 'genres', select: ['title', '_id'] })
-//       .populate({ path: 'lists', select: ['title', '_id'] })
+//       .populate({ path: 'lists', select: ['title', '_id', 'lists] })
 //       .populate({ path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] })
 //       .sort({ 'status.start': -1 })
 
@@ -79,7 +79,7 @@ class DashboardController {
 //   try {
 //     const response = await Book.find(filter, bookFieldsConfig)
 //       .populate({ path: 'genres', select: ['title', '_id'] })
-//       .populate({ path: 'lists', select: ['title', '_id'] })
+//       .populate({ path: 'lists', select: ['title', '_id', 'lists] })
 //       .populate({ path: 'authors.author', select: ['title', '_id'] })
 //       .sort({ 'status.finish': -1 })
 
