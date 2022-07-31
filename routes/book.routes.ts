@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authMiddleware } from '../middleware/auth.middleware'
-// import upload from '../middleware/upload'
+import upload from '../middleware/upload'
 import controller from '../controllers/book.controller'
 
 const router = Router()
@@ -15,6 +15,13 @@ router.get(
   '/:id',
   authMiddleware,
   controller.page
+)
+
+router.post(
+  '/:id/precover',
+  authMiddleware,
+  upload.single('preCoverImage'),
+  controller.setPreCover
 )
 
 router.patch(
@@ -40,13 +47,6 @@ router.patch(
 //   authMiddleware,
 //   upload.single('coverImage'),
 //   controller.update
-// )
-
-// router.post(
-//   '/:id/precover',
-//   authMiddleware,
-//   upload.single('preCoverImage'),
-//   controller.setPreCover
 // )
 
 // router.delete(

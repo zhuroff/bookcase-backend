@@ -1,8 +1,6 @@
 import { Request, Response } from 'express'
 // import { Book } from '../models/book.model'
 import bookService from '../services/book.service'
-// import fs from 'fs'
-// import path from 'path'
 
 class BookController {
   async list(req: Request, res: Response) {
@@ -21,6 +19,15 @@ class BookController {
       res.status(200).json(response)
     } catch (error) {
       console.log(error)
+      res.status(500).json(error)
+    }
+  }
+
+  async setPreCover(req: Request, res: Response) {
+    try {
+      const response = await bookService.upload(req)
+      res.json(response)
+    } catch (error) {
       res.status(500).json(error)
     }
   }
@@ -45,22 +52,6 @@ class BookController {
   }
 }
 
-// interface MulterRequest extends Request {
-//   file: any
-// }
-
-// const removeMediaFile = (filename: string) => {
-//   fs.rm(
-//     path.join(__dirname, '../', filename),
-//     { recursive: true },
-//     (error) => {
-//       if (error) {
-//         throw new Error(error.message)
-//       }
-//     }
-//   )
-// }
-
 // const cleanPreCoverField = (id: string) => {
 //   return new Promise(async (resolve, reject) => {
 //     try {
@@ -83,27 +74,6 @@ class BookController {
 //   try {
 //     await book.save()
 //     res.status(201).json(book)
-//   } catch (error) {
-//     res.status(500).json(error)
-//   }
-// }
-
-// const setPreCover = async (req: Request, res: Response) => {
-//   try {
-//     const cover = (req as MulterRequest).file
-//       ? `/uploads/covers/${(req as MulterRequest).file.filename}`
-//       : req.body.preCoverImage
-
-//     const $set = {
-//       preCoverImage: cover,
-//       dateModified: new Date()
-//     }
-
-//     await Book.findOneAndUpdate({
-//       _id: req.params.id
-//     }, { $set }, { new: true })
-
-//     res.json({ preCoverImage: cover })
 //   } catch (error) {
 //     res.status(500).json(error)
 //   }
@@ -224,16 +194,5 @@ class BookController {
 // //     res.status(500).json(error)
 // //   }
 // // }
-
-// const controller = {
-//   create,
-//   setPreCover,
-//   removePreCover,
-//   setArticleImage,
-//   removeArticleImage,
-//   // deleteBook
-// }
-
-// console.log(controller)
 
 export default new BookController()

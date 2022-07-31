@@ -11,8 +11,7 @@ import { List } from '../models/list.model'
 import { ISort, IFilter } from 'types/Common'
 import { BookItemDTO, BookPageDTO } from '../dto/book.dto'
 import { PaginationDTO } from '../dto/pagination.dto'
-import fs from 'fs'
-import path from 'path'
+import commonService from './common.service'
 
 class BookService {
   async list(req: Request, filter: IFilter = {}, sort?: ISort) {
@@ -102,13 +101,40 @@ class BookService {
       const timeDifference = (currentServerDate - bookModifiedTime) / 60_000
 
       if (timeDifference > 10) {
-        this.removeMediaFile(book.preCoverImage)
+        commonService.removeMediaFile(book.preCoverImage)
         await this.cleanPreCoverField(id)
         delete book.preCoverImage
       }
     }
 
     return new BookPageDTO(book)
+  }
+
+  async upload(req: Request) {
+    const cover = req.file
+      ? `/uploads/covers/${req.file.filename}`
+      : req.body.preCoverImage
+
+    const book: BookModel = await Book.findById(req.params['id']).lean()
+
+    if (book.preCoverImage) {
+      commonService.removeMediaFile(book.preCoverImage)
+    }
+
+    const $set = {
+      preCoverImage: cover,
+      dateModified: new Date()
+    }
+
+    const updatedBook = await Book.findOneAndUpdate({
+      _id: req.params['id']
+    }, { $set }, { new: true })
+
+    if (updatedBook) {
+      return new BookPageDTO(updatedBook)
+    }
+
+    throw { message: 'book.updateError' }
   }
 
   async update($set: Partial<BookModel>, _id?: string) {
@@ -185,18 +211,6 @@ class BookService {
     }
 
     return await Book.findOneAndDelete({ _id })
-  }
-
-  removeMediaFile(filename: string) {
-    fs.rm(
-      path.join(__dirname, '../', filename),
-      { recursive: true },
-      (error) => {
-        if (error) {
-          throw new Error(error.message)
-        }
-      }
-    )
   }
 
   cleanPreCoverField(id: string) {
