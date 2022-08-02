@@ -137,11 +137,73 @@ class BookService {
     throw { message: 'book.updateError' }
   }
 
-  async update($set: Partial<BookModel>, _id?: string) {
+  async update(payload: Partial<BookPageDTO>, _id?: string) {
     if (!_id) throw new Error('Param \'id\' is not defined')
-    // TODO: Update all pupulate models
-    return Promise.resolve({ isSuccess: true })
+    const originalBook = await Book.findById(_id).lean()
+    console.log(originalBook)
+    console.log(payload)
+    return true
+    // const payloadToSave = Object.entries($set).reduce((acc, [key, value]) => {
+    //   switch(key) {
+    //     case 'authors':
+    //       acc[key] = value.reduce((authors, { isDeleted, role, author }) => {
+    //         if (isDeleted) {
+    //           this.pullFromCategory(key, _id)
+    //         } else {
+    //           authors.push({
+    //             role,
+    //             author: author._id
+    //           })
+    //         }
+
+    //         return authors
+    //       }, [] as any)
+    //       break
+    //     case 'publishers':
+    //       acc[key] = value.reduce((publishers, { isDeleted, city, code, publisher }) => {
+    //         if (isDeleted) {
+    //           this.pullFromCategory(key, _id)
+    //         } else {
+    //           publishers.push({
+    //             city,
+    //             code,
+    //             publisher: publisher._id
+    //           })
+    //         }
+
+    //         return publishers
+    //       }, [] as any)
+    //       break
+    //     case 'genres':
+    //       acc[key] = (value as any).reduce((genres, { isDeleted, _id }) => {
+    //         if (isDeleted) {
+    //           this.pullFromCategory(key, _id)
+    //         } else {
+    //           genres.push(_id)
+    //         }
+
+    //         return genres
+    //       }, [] as string[])
+    //       break
+    //     case 'series':
+    //       if (value.isDeleted) {
+    //         this.pullFromCategory(key, _id)
+    //       } else {
+    //         acc[key] = value.current._id
+    //       }
+    //       break
+    //     case 'lists':
+
+    //   }
+
+    //   return acc
+    // }, {} as any)
+    // return payloadToSave
     // return await Book.findOneAndUpdate({ _id }, { $set }, { new: true }) && { isSuccess: true }
+  }
+
+  pullFromCategory(categoryName: string, bookId: string) {
+    console.log(categoryName, bookId)
   }
 
   async remove(_id?: string) {
