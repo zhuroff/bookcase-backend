@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { Types } from 'mongoose'
-import { BookModel } from '../types/Book'
+import { BookModel, BookModelPayload } from '../types/Book'
 import { TListSection, TListSectionContent } from '../types/List'
 import { Book } from '../models/book.model'
 import { Author } from '../models/author.model'
@@ -12,6 +12,7 @@ import { ISort, IFilter } from 'types/Common'
 import { BookItemDTO, BookPageDTO } from '../dto/book.dto'
 import { PaginationDTO } from '../dto/pagination.dto'
 import commonService from './common.service'
+import { AuthorBookPage, AuthorBookPagePayload, CategoryModel, PublisherBookPage, PublisherBookPagePayload } from 'types/Category'
 
 class BookService {
   async list(req: Request, filter: IFilter = {}, sort?: ISort) {
@@ -137,69 +138,110 @@ class BookService {
     throw { message: 'book.updateError' }
   }
 
-  async update(payload: Partial<BookPageDTO>, _id?: string) {
-    if (!_id) throw new Error('Param \'id\' is not defined')
-    const originalBook = await Book.findById(_id).lean()
+  async update(payload: Partial<BookPageDTO>, bookId?: string) {
+    if (!bookId) throw new Error('Param \'id\' is not defined')
+
+    const originalBook = await Book.findById(bookId).lean()
     console.log(originalBook)
-    console.log(payload)
+
+    const payloadToSave = Object.entries(payload).reduce((acc, [key, value]) => {
+      switch(key) {
+        case 'authors':
+          acc[key] = (value as AuthorBookPage[]).reduce((authors, { isDeleted, isAdded, isChanged, role, author }) => {
+            if (isDeleted) {
+              console.log('author deleted', author)
+            } else if (isAdded) {
+              console.log('author added', author)
+              authors.push({
+                role,
+                author: new Types.ObjectId(author._id)
+              })
+            } else if (isChanged) {
+              console.log('author changed', author)
+              authors.push({
+                role,
+                author: new Types.ObjectId(author._id)
+              })
+            } else {
+              console.log('author not changed', author)
+              authors.push({
+                role,
+                author: new Types.ObjectId(author._id)
+              })
+            }
+
+            return authors
+          }, [] as AuthorBookPagePayload[])
+          break
+        case 'publishers':
+          acc[key] = (value as PublisherBookPage[]).reduce((publishers, { isDeleted, isAdded, isChanged, city, code, publisher }) => {
+            if (isDeleted) {
+              console.log('publisher deleted', publisher)
+            } else if (isAdded) {
+              console.log('publisher added', publisher)
+              publishers.push({
+                city,
+                code,
+                publisher: new Types.ObjectId(publisher._id)
+              })
+            } else if (isChanged) {
+              console.log('publisher changed', publisher)
+              publishers.push({
+                city,
+                code,
+                publisher: new Types.ObjectId(publisher._id)
+              })
+            } else {
+              publishers.push({
+                city,
+                code,
+                publisher: new Types.ObjectId(publisher._id)
+              })
+            }
+
+            return publishers
+          }, [] as PublisherBookPagePayload[])
+          break
+        case 'genres':
+          acc[key] = (value as CategoryModel[]).reduce((genres, { isDeleted, isAdded, isChanged, title, _id }) => {
+            if (isDeleted) {
+              console.log('genre deleted', title)
+            } else if (isAdded) {
+              console.log('genre added', title)
+              genres.push(new Types.ObjectId(_id))
+            } else if (isChanged) {
+              console.log('genre changed', title)
+              genres.push(new Types.ObjectId(_id))
+            } else {
+              genres.push(new Types.ObjectId(_id))
+            }
+
+            return genres
+          }, [] as Types.ObjectId[])
+          break
+        case 'series':
+          if ((value as CategoryModel).isDeleted) {
+            console.log('series deleted', value)
+          } else if ((value as CategoryModel).isAdded) {
+            console.log('series added', value)
+            acc[key] = new Types.ObjectId((value as CategoryModel)._id)
+          } else if ((value as CategoryModel).isChanged) {
+            console.log('series changed', value)
+            acc[key] = new Types.ObjectId((value as CategoryModel)._id)
+          } else {
+            acc[key] = new Types.ObjectId((value as CategoryModel)._id)
+          }
+          break
+        default:
+          // @ts-ignore
+          acc[key] = value
+      }
+      return acc
+    }, {} as Partial<BookModelPayload>)
+
+    console.log(payloadToSave)
     return true
-    // const payloadToSave = Object.entries($set).reduce((acc, [key, value]) => {
-    //   switch(key) {
-    //     case 'authors':
-    //       acc[key] = value.reduce((authors, { isDeleted, role, author }) => {
-    //         if (isDeleted) {
-    //           this.pullFromCategory(key, _id)
-    //         } else {
-    //           authors.push({
-    //             role,
-    //             author: author._id
-    //           })
-    //         }
-
-    //         return authors
-    //       }, [] as any)
-    //       break
-    //     case 'publishers':
-    //       acc[key] = value.reduce((publishers, { isDeleted, city, code, publisher }) => {
-    //         if (isDeleted) {
-    //           this.pullFromCategory(key, _id)
-    //         } else {
-    //           publishers.push({
-    //             city,
-    //             code,
-    //             publisher: publisher._id
-    //           })
-    //         }
-
-    //         return publishers
-    //       }, [] as any)
-    //       break
-    //     case 'genres':
-    //       acc[key] = (value as any).reduce((genres, { isDeleted, _id }) => {
-    //         if (isDeleted) {
-    //           this.pullFromCategory(key, _id)
-    //         } else {
-    //           genres.push(_id)
-    //         }
-
-    //         return genres
-    //       }, [] as string[])
-    //       break
-    //     case 'series':
-    //       if (value.isDeleted) {
-    //         this.pullFromCategory(key, _id)
-    //       } else {
-    //         acc[key] = value.current._id
-    //       }
-    //       break
-    //     case 'lists':
-
-    //   }
-
-    //   return acc
-    // }, {} as any)
-    // return payloadToSave
-    // return await Book.findOneAndUpdate({ _id }, { $set }, { new: true }) && { isSuccess: true }
+    // return await Book.findOneAndUpdate({ _id: bookId }, { $set: payloadToSave }, { new: true }) && { isSuccess: true }
   }
 
   pullFromCategory(categoryName: string, bookId: string) {

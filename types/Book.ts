@@ -1,5 +1,5 @@
 import { PaginateModel, PopulatedDoc, Date, Document, Types } from 'mongoose'
-import { AuthorBookPage, CategoryModel, PublisherBookPage } from './Category'
+import { AuthorBookPage, AuthorBookPagePayload, CategoryModel, PublisherBookPage, PublisherBookPagePayload } from './Category'
 import { ListModel } from './List'
 
 export type BookLinks = {
@@ -38,6 +38,13 @@ export interface BookModel extends Document {
   status: ReadingStatus
   lists: PopulatedDoc<ListModel>[]
   accountability?: boolean
+}
+
+export type BookModelPayload = Omit<BookModel, 'authors' | 'genres' | 'series' | 'publishers' | 'lists'> & {
+  authors: AuthorBookPagePayload[]
+  publishers: PublisherBookPagePayload[]
+  genres: Types.ObjectId[]
+  series: Types.ObjectId
 }
 
 export interface IBook<T extends Document> extends PaginateModel<T> { }
