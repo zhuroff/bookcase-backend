@@ -44,6 +44,7 @@ export type BookModelPayload = Omit<BookModel, 'authors' | 'genres' | 'series' |
   authors: AuthorBookPagePayload[]
   publishers: PublisherBookPagePayload[]
   genres: Types.ObjectId[]
+  lists: Types.ObjectId[]
   series: Types.ObjectId
 }
 

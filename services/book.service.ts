@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { Types } from 'mongoose'
 import { BookModel, BookModelPayload } from '../types/Book'
-import { TListSection, TListSectionContent } from '../types/List'
+import { ListModel, TListSection, TListSectionContent } from '../types/List'
 import { Book } from '../models/book.model'
 import { Author } from '../models/author.model'
 import { Genre } from '../models/genre.model'
@@ -145,7 +145,7 @@ class BookService {
     console.log(originalBook)
 
     const payloadToSave = Object.entries(payload).reduce((acc, [key, value]) => {
-      switch(key) {
+      switch (key) {
         case 'authors':
           acc[key] = (value as AuthorBookPage[]).reduce((authors, { isDeleted, isAdded, isChanged, role, author }) => {
             if (isDeleted) {
@@ -232,6 +232,26 @@ class BookService {
             acc[key] = new Types.ObjectId((value as CategoryModel)._id)
           }
           break
+        case 'lists':
+          acc[key] = (value as ListModel[]).reduce((items, { isDeleted, isAdded, isChanged, _id }) => {
+            if (isDeleted) {
+              console.log('list deleted', _id)
+            } else if (isAdded) {
+              console.log('list added', _id)
+              items.push(new Types.ObjectId(_id))
+            } else if (isChanged) {
+              console.log('list changed', _id)
+              items.push(new Types.ObjectId(_id))
+            } else {
+              items.push(new Types.ObjectId(_id))
+            }
+
+            return items
+          }, [] as Types.ObjectId[])
+          break
+        case 'preCoverImage':
+          acc.coverImage = value as string
+          acc.preCoverImage = undefined
         default:
           // @ts-ignore
           acc[key] = value

@@ -19,6 +19,9 @@ export interface ListModel extends Document {
   title: string
   lists: TListSection[]
   dateCreated?: Date
+  isDeleted?: boolean
+  isAdded?: boolean
+  isChanged?: boolean
 }
 
 export interface IList<T extends Document> extends PaginateModel<T> { }
