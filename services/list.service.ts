@@ -1,18 +1,29 @@
 import { Request } from 'express'
 import { Book } from '../models/book.model'
 import { List } from '../models/list.model'
-import { ListItemDTO, ListPageDTO } from '../dto/list.dto'
+import { ListPageDTO } from '../dto/list.dto'
+import { PaginationDTO } from '../dto/pagination.dto'
 
 class ListService {
-  async list() {
-    const config = {
-      title: true,
-      isDraft: true,
-      lists: true
+  async list(req: Request) {
+    const options = {
+      page: req.body.page,
+      sort: req.body.sort,
+      limit: req.body.limit,
+      lean: true,
+      select: {
+        title: true,
+        isDraft: true,
+        lists: true
+      }
     }
 
-    const response = await List.find({}, config).sort({ title: 1 })
-    return response.map((list) => new ListItemDTO(list))
+    const response = await List.paginate({ isDraft: req.body.isDraft }, options)
+
+    return {
+      docs: response.docs,
+      pagination: new PaginationDTO(response)
+    }
   }
 
   async page(req: Request) {

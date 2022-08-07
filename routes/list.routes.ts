@@ -4,7 +4,7 @@ import controller from '../controllers/list.controller'
 
 const router = Router()
 
-router.get(
+router.post(
   '/',
   authMiddleware,
   controller.list
