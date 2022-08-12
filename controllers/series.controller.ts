@@ -44,20 +44,3 @@ class SeriesController {
 }
 
 export default new SeriesController()
-
-// const create = async (req: Request, res: Response) => {
-//   const payload = {
-//     isDraft: req.body.isDraft,
-//     title: req.body.title,
-//     books: []
-//   }
-
-//   const series = new Series(payload)
-
-//   try {
-//     await series.save()
-//     res.status(201).json(series)
-//   } catch(error) {
-//     res.status(500).json(error)
-//   }
-// }

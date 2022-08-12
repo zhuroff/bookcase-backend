@@ -43,21 +43,4 @@ class PublisherController {
   }
 }
 
-// const create = async (req: Request, res: Response) => {
-//   const payload = {
-//     isDraft: req.body.isDraft,
-//     title: req.body.title,
-//     books: []
-//   }
-
-//   const publisher = new Publisher(payload)
-
-//   try {
-//     await publisher.save()
-//     res.status(201).json(publisher)
-//   } catch (error) {
-//     res.status(500).json(error)
-//   }
-// }
-
 export default new PublisherController()

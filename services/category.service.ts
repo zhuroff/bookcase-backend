@@ -2,8 +2,14 @@ import { Request } from 'express'
 import { Model, PaginateModel } from 'mongoose'
 import { Book } from '../models/book.model'
 import { PaginationDTO } from '../dto/pagination.dto'
+import { validationResult } from 'express-validator'
 
 class CategoryService {
+  async create<T>(Model: Model<T, {}, {}>) {
+    const entity = new Model({ isDraft: true })
+    return await entity.save()
+  }
+
   async list<T>(
     req: Request,
     Model: PaginateModel<T>,
@@ -48,12 +54,22 @@ class CategoryService {
   }
 
   async update<T>(req: Request, Model: Model<T, {}, {}>) {
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+      throw errors.array()
+    }
+
     const query = { _id: req.params['id'] }
     const $set = req.body
 
     await Model.findOneAndUpdate(query, { $set }, { new: true })
 
     return { isSuccess: true }
+  }
+
+  async remove<T>(_id: string, Model: Model<T, {}, {}>) {
+    return await Model.deleteOne({ _id })
   }
 }
 

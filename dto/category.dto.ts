@@ -31,12 +31,23 @@ export class CategoryAuthorItemDTO extends CategoryItemDTO {
   firstName: string
   lastName?: string
   patronymicName?: string
+  title: string
 
   constructor(category: AuthorModel) {
     super(category)
     this.firstName = category.firstName
     this.lastName = category.lastName
     this.patronymicName = category.patronymicName
+    this.title = this.computedTitle(category)
+  }
+
+  computedTitle(category: AuthorModel) {
+    const { firstName, lastName } = category
+    if (lastName) {
+      return `${lastName}, ${firstName}`
+    }
+
+    return firstName
   }
 }
 

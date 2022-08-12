@@ -5,6 +5,15 @@ import { AuthorModel } from '../types/Category'
 import categoryService from '../services/category.service'
 
 class AuthorController {
+  async create(req: Request, res: Response) {
+    try {
+      const response = await categoryService.create<AuthorModel>(Author)
+      res.status(201).json({ _id: response._id })
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  }
+
   async list(req: Request, res: Response) {
     try {
       const selectExtends = {
@@ -46,40 +55,15 @@ class AuthorController {
       res.status(500).json(error)
     }
   }
-}
 
-const computedTitle = (firstName: string, lastName: string | null, patronymicName: string | null): string => {
-  if (lastName) {
-    return `${lastName}, ${firstName}` + (patronymicName ? ` ${patronymicName}` : '')
-  }
-
-  return firstName
-}
-
-const create = async (req: Request, res: Response) => {
-  const payload = {
-    firstName: req.body.firstName || '',
-    lastName: req.body.lastName || null,
-    patronymicName: req.body.patronymicName || null,
-    isDraft: req.body.isDraft,
-    title: computedTitle(req.body.firstName, req.body.lastName, req.body.patronymicName),
-    books: []
-  }
-
-  const author = new Author(payload)
-
-  try {
-    await author.save()
-    res.status(201).json(author)
-  } catch (error) {
-    res.status(500).json(error)
+  async remove(req: Request, res: Response) {
+    try {
+      const response = await categoryService.remove<AuthorModel>(String(req.params['id']), Author)
+      return res.status(201).json(response)
+    } catch (error) {
+      res.status(500).json(error)
+    }
   }
 }
-
-const controller = {
-  create,
-}
-
-console.log(controller)
 
 export default new AuthorController()
