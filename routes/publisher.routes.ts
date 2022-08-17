@@ -1,8 +1,15 @@
 import { Router } from 'express'
 import { authMiddleware } from '../middleware/auth.middleware'
+import { categoryValidator } from '../middleware/category.validator'
 import controller from '../controllers/publisher.controller'
 
 const router = Router()
+
+router.post(
+  '/create',
+  authMiddleware,
+  controller.create
+)
 
 router.post(
   '/',
@@ -19,13 +26,14 @@ router.get(
 router.patch(
   '/:id',
   authMiddleware,
+  categoryValidator,
   controller.update
 )
 
-// router.post(
-//   '/create',
-//   authMiddleware,
-//   controller.create
-// )
+router.delete(
+  '/:id',
+  authMiddleware,
+  controller.remove
+)
 
 export default router

@@ -17,23 +17,17 @@ const AuthorSchema: Schema<AuthorModel> = new Schema({
 
   firstName: {
     type: String,
+    index: true,
     required: isRequired
   },
 
   lastName: {
-    type: String || null,
-    required: false
+    type: String,
+    index: true
   },
 
   patronymicName: {
-    type: String || null,
-    required: false
-  },
-
-  title: {
-    type: String,
-    required: isRequired,
-    index: true
+    type: String
   },
 
   links: [
@@ -42,21 +36,17 @@ const AuthorSchema: Schema<AuthorModel> = new Schema({
         type: String,
         required: true
       },
-
       url: {
         type: String,
-        required: true
-      },
-
-      required: false
+        required: true,
+      }
     }
   ],
 
   books: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'book',
-      required: false
+      ref: 'book'
     }
   ]
 })

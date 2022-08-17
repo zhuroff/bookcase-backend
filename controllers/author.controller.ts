@@ -7,8 +7,8 @@ import categoryService from '../services/category.service'
 class AuthorController {
   async create(req: Request, res: Response) {
     try {
-      const response = await categoryService.create<AuthorModel>(Author)
-      res.status(201).json({ _id: response._id })
+      const response = await categoryService.create<AuthorModel>(req, Author)
+      res.status(201).json(new CategoryAuthorItemDTO(response as AuthorModel))
     } catch (error) {
       res.status(500).json(error)
     }
@@ -48,7 +48,13 @@ class AuthorController {
 
   async update(req: Request, res: Response) {
     try {
-      const response = await categoryService.update<AuthorModel>(req, Author)
+      const requiredFields = Object.entries(Author.schema.paths).reduce<string[]>((acc, [key, { validators }]) => {
+        if (validators.length && key !== 'isDraft') {
+          acc.push(key)
+        }
+        return acc
+      }, [])
+      const response = await categoryService.update<AuthorModel>(req, Author, requiredFields)
       return res.status(201).json(response)
     } catch (error) {
       console.log(error)

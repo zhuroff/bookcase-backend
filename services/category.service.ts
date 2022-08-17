@@ -5,8 +5,8 @@ import { PaginationDTO } from '../dto/pagination.dto'
 import { validationResult } from 'express-validator'
 
 class CategoryService {
-  async create<T>(Model: Model<T, {}, {}>) {
-    const entity = new Model({ isDraft: true })
+  async create<T>(req: Request, Model: Model<T, {}, {}>) {
+    const entity = new Model(req.body)
     return await entity.save()
   }
 
@@ -41,7 +41,16 @@ class CategoryService {
       .populate({
         path: 'books',
         model: Book,
-        select: ['title', 'subtitle', '_id', 'coverImage', 'status', 'pages', 'publicationYear', 'accountability'],
+        select: [
+          'title',
+          'subtitle',
+          '_id',
+          'coverImage',
+          'status',
+          'pages',
+          'publicationYear',
+          'accountability'
+        ],
         populate: [
           { path: 'genres', select: ['title', '_id'] },
           { path: 'lists', select: ['title', '_id', 'lists'] },
@@ -53,15 +62,24 @@ class CategoryService {
     return response
   }
 
-  async update<T>(req: Request, Model: Model<T, {}, {}>) {
+  async update<T>(req: Request, Model: Model<T, {}, {}>, requiredFields: string[]) {
     const errors = validationResult(req)
-
-    if (!errors.isEmpty()) {
-      throw errors.array()
-    }
-
     const query = { _id: req.params['id'] }
     const $set = req.body
+
+    if (!$set.isDraft) {
+      const entity = await Model.findById<T>(req.params['id']).lean().exec()
+      const invalidByRequired = requiredFields.reduce((acc, next) => {
+        if (!Object.prototype.hasOwnProperty.call(entity, next) && !$set[next]) {
+          acc += 1
+        }
+        return acc
+      }, 0)
+
+      if (invalidByRequired > 0 && !errors.isEmpty()) {
+        throw errors.array()
+      }
+    }
 
     await Model.findOneAndUpdate(query, { $set }, { new: true })
 
