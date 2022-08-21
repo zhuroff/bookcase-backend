@@ -1,47 +1,60 @@
-import { Schema } from 'mongoose'
-import { BookModel } from 'types/Book'
-import { AuthorModel, CategoryModel } from "types/Category"
-import { TEntityLink } from 'types/Common'
-import { BookItemDTO } from '../dto/book.dto'
+import { Types } from 'mongoose'
+import { TEntityLink } from '../types/Common'
+import {
+  CategoryDocument,
+  CategoryModelResponse,
+  AuthorDocument,
+  AuthorModelResponse
+} from '../types/Category'
 
 export class CategoryItemDTO {
   _id: string
   title: string
-  books: number | BookItemDTO[]
+  booksCount: number
   isDraft: boolean
 
-  constructor(category: CategoryModel) {
+  constructor(category: CategoryDocument & { _id: Types.ObjectId }) {
     this._id = category._id
     this.title = category.title
-    this.books = category.books.length
+    this.booksCount = category.books.length
     this.isDraft = category.isDraft
   }
 }
 
-export class CategoryPageDTO extends CategoryItemDTO {
-  books: BookItemDTO[]
+export class CategoryPageDTO {
+  _id: string
+  title: string
+  isDraft: boolean
+  books: CategoryModelResponse['books']
 
-  constructor(category: CategoryModel) {
-    super(category)
-    this.books = (category.books as BookModel[]).map((book) => new BookItemDTO(book))
+  constructor(category: CategoryModelResponse & { _id: Types.ObjectId }) {
+    this._id = String(category._id)
+    this.title = category.title
+    this.isDraft = category.isDraft
+    this.books = category.books
   }
 }
 
-export class CategoryAuthorItemDTO extends CategoryItemDTO {
+export class CategoryAuthorItemDTO {
+  _id: string
+  title: string
+  booksCount: number
+  isDraft: boolean
   firstName: string
   lastName?: string
   patronymicName?: string
-  title: string
 
-  constructor(category: AuthorModel) {
-    super(category)
+  constructor(category: AuthorDocument & { _id: Types.ObjectId }) {
+    this._id = String(category._id)
+    this.booksCount = category.books.length
+    this.isDraft = category.isDraft
     this.firstName = category.firstName
     this.lastName = category.lastName
     this.patronymicName = category.patronymicName
-    this.title = this.computedTitle(category)
+    this.title = this.#computedTitle(category)
   }
 
-  computedTitle(category: AuthorModel) {
+  #computedTitle(category: AuthorDocument & { _id: Types.ObjectId }) {
     const { firstName, lastName } = category
     if (lastName) {
       return `${lastName}, ${firstName}`
@@ -51,13 +64,22 @@ export class CategoryAuthorItemDTO extends CategoryItemDTO {
   }
 }
 
-export class CategoryAuthorPageDTO extends CategoryAuthorItemDTO {
-  books: BookItemDTO[]
+export class CategoryAuthorPageDTO {
+  _id: string
+  isDraft: boolean
+  firstName: string
+  lastName?: string
+  patronymicName?: string
+  books: CategoryModelResponse['books']
   links?: TEntityLink[]
 
-  constructor(category: AuthorModel & { _id: Schema.Types.ObjectId }) {
-    super(category)
-    this.books = (category.books as BookModel[]).map((book) => new BookItemDTO(book))
+  constructor(category: AuthorModelResponse & { _id: Types.ObjectId }) {
+    this._id = String(category._id)
+    this.isDraft = category.isDraft
+    this.firstName = category.firstName
+    this.lastName = category.lastName
+    this.patronymicName = category.patronymicName
+    this.books = category.books
     this.links = category.links || []
   }
 }

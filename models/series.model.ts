@@ -1,10 +1,10 @@
-import { model, Schema } from 'mongoose'
-import { CategoryModel, ICategory } from '../types/Category'
-import mongoosePaginate from 'mongoose-paginate-v2'
+import { model, Schema, PaginateModel } from 'mongoose'
+import { CategoryModel, CategoryDocument } from '../types/Category'
+import paginate from 'mongoose-paginate-v2'
 
 const isRequired = (): boolean => (this as unknown as CategoryModel).isDraft
 
-const SeriesSchema: Schema<CategoryModel> = new Schema({
+const SeriesSchema = new Schema({
   isDraft: {
     type: Boolean,
     required: true
@@ -30,7 +30,5 @@ const SeriesSchema: Schema<CategoryModel> = new Schema({
   ]
 })
 
-SeriesSchema.index({ title: 'text' })
-SeriesSchema.plugin(mongoosePaginate)
-
-export const Series = model<CategoryModel>('series', SeriesSchema) as ICategory<CategoryModel>
+SeriesSchema.plugin(paginate)
+export const Series = model<CategoryDocument, PaginateModel<CategoryDocument>>('series', SeriesSchema)

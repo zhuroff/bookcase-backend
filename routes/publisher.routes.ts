@@ -17,7 +17,7 @@ router.post(
   controller.list
 )
 
-router.get(
+router.post(
   '/:id',
   authMiddleware,
   controller.page

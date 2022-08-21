@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
+import { Types } from 'mongoose'
 import { Series } from '../models/series.model'
-import { CategoryModel } from '../types/Category'
 import { CategoryItemDTO, CategoryPageDTO } from '../dto/category.dto'
 import categoryService from '../services/category.service'
 
 class SeriesController {
   async create(req: Request, res: Response) {
     try {
-      const response = await categoryService.create<CategoryModel>(req, Series)
-      res.status(201).json(new CategoryItemDTO(response as CategoryModel))
+      const response = await categoryService.create(req, Series)
+      res.status(201).json(new CategoryItemDTO(response as any))
     } catch (error) {
       res.status(500).json(error)
     }
@@ -16,7 +16,7 @@ class SeriesController {
 
   async list(req: Request, res: Response) {
     try {
-      const response = await categoryService.list<CategoryModel>(req, Series)
+      const response = await categoryService.list(req, Series)
 
       res.status(200).json({
         ...response,
@@ -29,11 +29,13 @@ class SeriesController {
 
   async page(req: Request, res: Response) {
     try {
-      const response = await categoryService.page<CategoryModel>(req, Series)
+      const bookFilter = {
+        series: { $eq: new Types.ObjectId(req.params['id']) }
+      }
+      const { category, books } = await categoryService.page(req, bookFilter, Series)
 
-      if (response) {
-        // @ts-ignore
-        res.status(200).json(new CategoryPageDTO(response))
+      if (category && books) {
+        res.status(200).json(new CategoryPageDTO({ ...category, books }))
       }
     } catch (error) {
       console.log(error)
@@ -49,7 +51,7 @@ class SeriesController {
         }
         return acc
       }, [])
-      const response = await categoryService.update<CategoryModel>(req, Series, requiredFields)
+      const response = await categoryService.update(req, Series, requiredFields)
       return res.status(201).json(response)
     } catch (error) {
       console.log(error)
@@ -59,7 +61,7 @@ class SeriesController {
 
   async remove(req: Request, res: Response) {
     try {
-      const response = await categoryService.remove<CategoryModel>(String(req.params['id']), Series)
+      const response = await categoryService.remove(String(req.params['id']), Series)
       return res.status(201).json(response)
     } catch (error) {
       res.status(500).json(error)

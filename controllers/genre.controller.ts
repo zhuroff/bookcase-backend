@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
+import { Types } from 'mongoose'
 import { Genre } from '../models/genre.model'
-import { CategoryModel } from '../types/Category'
 import { CategoryItemDTO, CategoryPageDTO } from '../dto/category.dto'
 import categoryService from '../services/category.service'
 
 class GenreController {
   async create(req: Request, res: Response) {
     try {
-      const response = await categoryService.create<CategoryModel>(req, Genre)
-      res.status(201).json(new CategoryItemDTO(response as CategoryModel))
+      const response = await categoryService.create(req, Genre)
+      res.status(201).json(new CategoryItemDTO(response as any))
     } catch (error) {
       res.status(500).json(error)
     }
@@ -16,7 +16,7 @@ class GenreController {
 
   async list(req: Request, res: Response) {
     try {
-      const response = await categoryService.list<CategoryModel>(req, Genre)
+      const response = await categoryService.list(req, Genre)
 
       res.status(200).json({
         ...response,
@@ -29,13 +29,18 @@ class GenreController {
 
   async page(req: Request, res: Response) {
     try {
-      const response = await categoryService.page<CategoryModel>(req, Genre)
+      const bookFilter = {
+        genres: {
+          $elemMatch: { $eq: new Types.ObjectId(req.params['id']) }
+        }
+      }
+      const { category, books } = await categoryService.page(req, bookFilter, Genre)
 
-      if (response) {
-        // @ts-ignore
-        res.status(200).json(new CategoryPageDTO(response))
+      if (category && books) {
+        res.status(200).json(new CategoryPageDTO({ ...category, books }))
       }
     } catch (error) {
+      console.log(error)
       res.status(500).json(error)
     }
   }
@@ -48,7 +53,7 @@ class GenreController {
         }
         return acc
       }, [])
-      const response = await categoryService.update<CategoryModel>(req, Genre, requiredFields)
+      const response = await categoryService.update(req, Genre, requiredFields)
       return res.status(201).json(response)
     } catch (error) {
       console.log(error)
@@ -58,7 +63,7 @@ class GenreController {
 
   async remove(req: Request, res: Response) {
     try {
-      const response = await categoryService.remove<CategoryModel>(String(req.params['id']), Genre)
+      const response = await categoryService.remove(String(req.params['id']), Genre)
       return res.status(201).json(response)
     } catch (error) {
       res.status(500).json(error)

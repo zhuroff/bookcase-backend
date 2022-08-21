@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
+import { Types } from 'mongoose'
 import { Publisher } from '../models/publisher.model'
-import { CategoryModel } from '../types/Category'
 import { CategoryItemDTO, CategoryPageDTO } from '../dto/category.dto'
 import categoryService from '../services/category.service'
 
 class PublisherController {
   async create(req: Request, res: Response) {
     try {
-      const response = await categoryService.create<CategoryModel>(req, Publisher)
-      res.status(201).json(new CategoryItemDTO(response as CategoryModel))
+      const response = await categoryService.create(req, Publisher)
+      res.status(201).json(new CategoryItemDTO(response as any))
     } catch (error) {
       res.status(500).json(error)
     }
@@ -16,7 +16,7 @@ class PublisherController {
 
   async list(req: Request, res: Response) {
     try {
-      const response = await categoryService.list<CategoryModel>(req, Publisher)
+      const response = await categoryService.list(req, Publisher)
 
       res.status(200).json({
         ...response,
@@ -29,11 +29,15 @@ class PublisherController {
 
   async page(req: Request, res: Response) {
     try {
-      const response = await categoryService.page<CategoryModel>(req, Publisher)
+      const bookFilter = {
+        publishers: {
+          $elemMatch: { publisher: { $eq: new Types.ObjectId(req.params['id']) } }
+        }
+      }
+      const { category, books } = await categoryService.page(req, bookFilter, Publisher)
 
-      if (response) {
-        // @ts-ignore
-        res.status(200).json(new CategoryPageDTO(response))
+      if (category && books) {
+        res.status(200).json(new CategoryPageDTO({ ...category, books }))
       }
     } catch (error) {
       console.log(error)
@@ -49,7 +53,7 @@ class PublisherController {
         }
         return acc
       }, [])
-      const response = await categoryService.update<CategoryModel>(req, Publisher, requiredFields)
+      const response = await categoryService.update(req, Publisher, requiredFields)
       return res.status(201).json(response)
     } catch (error) {
       console.log(error)
@@ -59,7 +63,7 @@ class PublisherController {
 
   async remove(req: Request, res: Response) {
     try {
-      const response = await categoryService.remove<CategoryModel>(String(req.params['id']), Publisher)
+      const response = await categoryService.remove(String(req.params['id']), Publisher)
       return res.status(201).json(response)
     } catch (error) {
       res.status(500).json(error)

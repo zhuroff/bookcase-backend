@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
+import { Types } from 'mongoose'
 import { Author } from '../models/author.model'
 import { CategoryAuthorItemDTO, CategoryAuthorPageDTO } from '../dto/category.dto'
-import { AuthorModel } from '../types/Category'
 import categoryService from '../services/category.service'
 
 class AuthorController {
   async create(req: Request, res: Response) {
     try {
-      const response = await categoryService.create<AuthorModel>(req, Author)
-      res.status(201).json(new CategoryAuthorItemDTO(response as AuthorModel))
+      const response = await categoryService.create(req, Author)
+      res.status(201).json(new CategoryAuthorItemDTO(response as any))
     } catch (error) {
       res.status(500).json(error)
     }
@@ -21,7 +21,7 @@ class AuthorController {
         lastName: true,
         patronymicName: true
       }
-      const response = await categoryService.list<AuthorModel>(req, Author, selectExtends)
+      const response = await categoryService.list(req, Author, selectExtends)
 
       res.status(200).json({
         ...response,
@@ -34,11 +34,15 @@ class AuthorController {
 
   async page(req: Request, res: Response) {
     try {
-      const response = await categoryService.page<AuthorModel>(req, Author)
+      const bookFilter = {
+        authors: {
+          $elemMatch: { author: { $eq: new Types.ObjectId(req.params['id']) } }
+        }
+      }
+      const { category, books } = await categoryService.page(req, bookFilter, Author)
 
-      if (response) {
-        // @ts-ignore
-        res.status(200).json(new CategoryAuthorPageDTO(response))
+      if (category && books) {
+        res.status(200).json(new CategoryAuthorPageDTO({ ...category, books }))
       }
     } catch (error) {
       console.log(error)
@@ -54,7 +58,7 @@ class AuthorController {
         }
         return acc
       }, [])
-      const response = await categoryService.update<AuthorModel>(req, Author, requiredFields)
+      const response = await categoryService.update(req, Author, requiredFields)
       return res.status(201).json(response)
     } catch (error) {
       console.log(error)
@@ -64,7 +68,7 @@ class AuthorController {
 
   async remove(req: Request, res: Response) {
     try {
-      const response = await categoryService.remove<AuthorModel>(String(req.params['id']), Author)
+      const response = await categoryService.remove(String(req.params['id']), Author)
       return res.status(201).json(response)
     } catch (error) {
       res.status(500).json(error)

@@ -1,11 +1,12 @@
 import { Request } from 'express'
-import { Model, PaginateModel } from 'mongoose'
-import { Book } from '../models/book.model'
+import { PaginateModel } from 'mongoose'
 import { PaginationDTO } from '../dto/pagination.dto'
 import { validationResult } from 'express-validator'
+import { IFilter } from '../types/Common'
+import bookService from './book.service'
 
 class CategoryService {
-  async create<T>(req: Request, Model: Model<T, {}, {}>) {
+  async create<T>(req: Request, Model: PaginateModel<T, {}, {}>) {
     const entity = new Model(req.body)
     return await entity.save()
   }
@@ -36,33 +37,14 @@ class CategoryService {
     }
   }
 
-  async page<T>(req: Request, Model: Model<T, {}, {}>) {
-    const response = await Model.findById(req.params['id'])
-      .populate({
-        path: 'books',
-        model: Book,
-        select: [
-          'title',
-          'subtitle',
-          '_id',
-          'coverImage',
-          'status',
-          'pages',
-          'publicationYear',
-          'accountability'
-        ],
-        populate: [
-          { path: 'genres', select: ['title', '_id'] },
-          { path: 'lists', select: ['title', '_id', 'lists'] },
-          { path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] }
-        ]
-      })
-      .lean()
+  async page<T>(req: Request, bookFilter: IFilter, Model: PaginateModel<T, {}, {}>) {
+    const category = await Model.findById(req.params['id']).lean()
+    const books = await bookService.list(req, bookFilter, { title: 1 })
 
-    return response
+    return { category, books }
   }
 
-  async update<T>(req: Request, Model: Model<T, {}, {}>, requiredFields: string[]) {
+  async update<T>(req: Request, Model: PaginateModel<T, {}, {}>, requiredFields: string[]) {
     const errors = validationResult(req)
     const query = { _id: req.params['id'] }
     const $set = req.body
@@ -86,7 +68,7 @@ class CategoryService {
     return { isSuccess: true }
   }
 
-  async remove<T>(_id: string, Model: Model<T, {}, {}>) {
+  async remove<T>(_id: string, Model: PaginateModel<T, {}, {}>) {
     return await Model.deleteOne({ _id })
   }
 }

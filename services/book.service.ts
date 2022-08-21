@@ -25,7 +25,7 @@ class BookService {
     const options: IFilter = {
       page: req.body.page || 1,
       sort: sort || req.body.sort,
-      limit: req.body.limit || 100,
+      limit: req.body.limit || 30,
       populate: booksListPopulates,
       lean: true,
       select: {
@@ -154,18 +154,21 @@ class BookService {
               console.log('author added', author)
               authors.push({
                 role,
+                // @ts-ignore
                 author: new Types.ObjectId(author._id)
               })
             } else if (isChanged) {
               console.log('author changed', author)
               authors.push({
                 role,
+                // @ts-ignore
                 author: new Types.ObjectId(author._id)
               })
             } else {
               console.log('author not changed', author)
               authors.push({
                 role,
+                // @ts-ignore
                 author: new Types.ObjectId(author._id)
               })
             }
@@ -182,6 +185,7 @@ class BookService {
               publishers.push({
                 city,
                 code,
+                // @ts-ignore
                 publisher: new Types.ObjectId(publisher._id)
               })
             } else if (isChanged) {
@@ -189,12 +193,14 @@ class BookService {
               publishers.push({
                 city,
                 code,
+                // @ts-ignore
                 publisher: new Types.ObjectId(publisher._id)
               })
             } else {
               publishers.push({
                 city,
                 code,
+                // @ts-ignore
                 publisher: new Types.ObjectId(publisher._id)
               })
             }
@@ -203,6 +209,7 @@ class BookService {
           }, [] as PublisherBookPagePayload[])
           break
         case 'genres':
+          // @ts-ignore
           acc[key] = (value as CategoryModel[]).reduce((genres, { isDeleted, isAdded, isChanged, title, _id }) => {
             if (isDeleted) {
               console.log('genre deleted', title)
@@ -220,15 +227,21 @@ class BookService {
           }, [] as Types.ObjectId[])
           break
         case 'series':
+          // @ts-ignore
           if ((value as CategoryModel).isDeleted) {
             console.log('series deleted', value)
+            // @ts-ignore
           } else if ((value as CategoryModel).isAdded) {
             console.log('series added', value)
+            // @ts-ignore
             acc[key] = new Types.ObjectId((value as CategoryModel)._id)
+            // @ts-ignore
           } else if ((value as CategoryModel).isChanged) {
             console.log('series changed', value)
+            // @ts-ignore
             acc[key] = new Types.ObjectId((value as CategoryModel)._id)
           } else {
+            // @ts-ignore
             acc[key] = new Types.ObjectId((value as CategoryModel)._id)
           }
           break
@@ -277,6 +290,7 @@ class BookService {
       response.authors.map(async ({ author }) => (
         await Author.findOneAndUpdate(
           { _id: author },
+          // @ts-ignore
           { $pull: { books: new Types.ObjectId(_id) } },
           { new: true }
         )
@@ -287,6 +301,7 @@ class BookService {
       response.genres.map(async (genre) => (
         await Genre.findOneAndUpdate(
           { _id: genre },
+          // @ts-ignore
           { $pull: { books: new Types.ObjectId(_id) } },
           { new: true })
       ))
@@ -296,6 +311,7 @@ class BookService {
       response.publishers.map(async ({ publisher }) => (
         await Publisher.findOneAndUpdate(
           { _id: publisher },
+          // @ts-ignore
           { $pull: { books: new Types.ObjectId(_id) } },
           { new: true })
       ))
@@ -329,6 +345,7 @@ class BookService {
     if (response?.series) {
       await Series.findOneAndUpdate(
         { _id: response.series },
+        // @ts-ignore
         { $pull: { books: new Types.ObjectId(_id) } },
         { new: true }
       )
