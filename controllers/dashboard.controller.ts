@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ISort, IFilter } from 'types/Common'
+import { QuerySort, QueryFilter } from 'types/Common'
 import { Book } from '../models/book.model'
 import { Genre } from '../models/genre.model'
 import { List } from '../models/list.model'
@@ -15,11 +15,11 @@ import bookService from '../services/book.service'
 class DashboardController {
   async reading(req: Request, res: Response) {
     try {
-      const filter: IFilter = {
+      const filter: QueryFilter = {
         'status.start': { $ne: null },
         'status.finish': { $eq: null }
       }
-      const sort: ISort = { 'status.start': -1 }
+      const sort: QuerySort = { 'status.start': -1 }
       const response = await bookService.list(req, filter, sort)
 
       res.json(response)
@@ -30,13 +30,13 @@ class DashboardController {
 
   async read(req: Request, res: Response) {
     try {
-      const filter: IFilter = {
+      const filter: QueryFilter = {
         'status.finish': {
           $gte: `${req.body.year}-01-01`,
           $lte: `${req.body.year}-12-31`
         }
       }
-      const sort: ISort = { 'status.finish': -1 }
+      const sort: QuerySort = { 'status.finish': -1 }
       const response = await bookService.list(req, filter, sort)
 
       res.json(response)

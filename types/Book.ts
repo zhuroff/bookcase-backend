@@ -1,7 +1,8 @@
+// REFACTORED
 import { Date, Document, Types } from 'mongoose'
 import { PaginationModel } from 'mongoose-paginate-ts'
-import { AuthorBookItem } from './Category'
-import { IEntityBasic } from './Common'
+import { AuthorBookPage, PublisherBookPage } from './Category'
+import { EntityBasic } from './Common'
 import { ListDocument } from './List'
 
 export type BookLinks = {
@@ -51,10 +52,20 @@ export type BookDocument = Document & {
 }
 
 export type PopulatedBookItemModels = {
-  authors: { author: AuthorBookItem }[]
-  genres: IEntityBasic[]
+  authors: AuthorBookPage[]
+  genres: EntityBasic[]
   lists: ListDocument[]
 }
 
-export type BookDocumentResponse = Omit<BookDocument, 'authors' | 'genres' | 'lists'> & PopulatedBookItemModels
-export type BookItemResponse = PaginationModel<BookDocumentResponse> | undefined
+export type PopulatedBookPageModels = PopulatedBookItemModels & {
+  publishers: PublisherBookPage[]
+  series: EntityBasic
+  notes: EntityBasic[]
+}
+
+type BookItemResponseExcluded = 'authors' | 'genres' | 'lists'
+type BookPageResponseExcluded = BookItemResponseExcluded | 'publishers' | 'series' | 'notes'
+
+export type BookItemResponse = Omit<BookDocument, BookItemResponseExcluded> & PopulatedBookItemModels
+export type BookItemPaginated = PaginationModel<BookItemResponse> | undefined
+export type BookPageResponse = Omit<BookDocument, BookPageResponseExcluded> & PopulatedBookPageModels

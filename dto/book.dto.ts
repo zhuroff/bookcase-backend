@@ -1,21 +1,21 @@
-import { Types, _LeanDocument } from 'mongoose'
+// REFACTORED
+import { Types } from 'mongoose'
+import { EntityBasic } from '../types/Common'
 import { ListDocument, ListTree } from 'types/List'
-import { IEntityBasic } from '../types/Common'
-import { AuthorBookItem } from '../types/Category'
-import { BookLinks, ReadingStatus, BookDocument, BookDocumentResponse } from '../types/Book'
+import { AuthorBookItem, AuthorBookPage, PublisherBookPage } from '../types/Category'
+import { BookLinks, ReadingStatus, BookItemResponse, BookPageResponse } from '../types/Book'
 
-export class BookItemDTO {
+class BookCommon<T extends BookItemResponse | BookPageResponse> {
   _id: string
   isDraft: boolean
   title: string
   subtitle?: string
-  authors: AuthorBookItem[]
-  genres: IEntityBasic[]
+  genres: EntityBasic[]
+  lists: ListTree[]
   coverImage?: string
   publicationYear: number
   pages: number
   status: ReadingStatus
-  lists: ListTree[]
   accountability?: boolean
 
   #listTreeBuilder(bookID: Types.ObjectId, lists?: ListDocument[]) {
@@ -39,25 +39,32 @@ export class BookItemDTO {
     }))
   }
 
-  constructor(book: BookDocumentResponse) {
+  constructor(book: T) {
     this._id = book._id
-    this.title = book.title
-    this.authors = book.authors.map(({ author }) => author)
-    this.coverImage = book.coverImage
-    this.genres = book.genres
     this.isDraft = book.isDraft
-    this.lists = this.#listTreeBuilder(book._id, book.lists)
-    this.publicationYear = book.publicationYear
-    this.status = book.status
+    this.title = book.title
     this.subtitle = book.subtitle
+    this.genres = book.genres
+    this.lists = this.#listTreeBuilder(book._id, book.lists)
+    this.coverImage = book.coverImage
+    this.publicationYear = book.publicationYear
     this.pages = book.pages
+    this.status = book.status
     this.accountability = book.accountability ?? true
   }
 }
 
-export class BookPageDTO extends BookItemDTO {
-  // @ts-ignore
-  authors: AuthorBookPage[]
+export class BookItemDTO extends BookCommon<BookItemResponse> {
+  authors: AuthorBookItem[]
+
+  constructor(book: BookItemResponse) {
+    super(book)
+    this.authors = book.authors.map(({ author }) => author)
+  }
+}
+
+export class BookPageDTO extends BookCommon<BookPageResponse> {
+  authors: Array<Pick<AuthorBookPage, '_id' | 'role'> & { author: EntityBasic }>
   contents?: string
   coverType: string
   description?: string
@@ -65,20 +72,27 @@ export class BookPageDTO extends BookItemDTO {
   format: string
   links?: BookLinks[]
   preCoverImage?: string
-  // @ts-ignore
   publishers: PublisherBookPage[]
   rating?: number
   series?: any
   status: ReadingStatus
   summary?: string
-  notes: any
+  notes: EntityBasic[]
 
-  constructor(book: _LeanDocument<BookDocument & { _id: Types.ObjectId }>) {
-    console.log(book)
-    // @ts-ignore
+  #authorMapper(authors: AuthorBookPage[]) {
+    return authors.map(({ _id, role, author }) => ({
+      role,
+      _id,
+      author: {
+        _id: author._id,
+        title: author.lastName ? `${author.lastName}, ${author.firstName}` : author.firstName
+      }
+    }))
+  }
+
+  constructor(book: BookPageResponse) {
     super(book)
-    // @ts-ignore
-    this.authors = book.authors
+    this.authors = this.#authorMapper(book.authors)
     this.contents = book.contents
     this.coverType = book.coverType
     this.description = book.description

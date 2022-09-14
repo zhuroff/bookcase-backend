@@ -1,19 +1,19 @@
 import { Request } from 'express'
-import { PaginateModel } from 'mongoose'
 import { PaginationDTO } from '../dto/pagination.dto'
 import { validationResult } from 'express-validator'
-import { IFilter } from '../types/Common'
+import { QueryFilter } from '../types/Common'
 import bookService from './book.service'
+import { Pagination } from 'mongoose-paginate-ts'
 
 class CategoryService {
-  async create<T>(req: Request, Model: PaginateModel<T, {}, {}>) {
+  async create<T>(req: Request, Model: Pagination<T>) {
     const entity = new Model(req.body)
     return await entity.save()
   }
 
   async list<T>(
     req: Request,
-    Model: PaginateModel<T>,
+    Model: Pagination<T>,
     selectExtends: { [index: string]: boolean } = {}
   ) {
     const options = {
@@ -21,6 +21,9 @@ class CategoryService {
       sort: req.body.sort,
       limit: req.body.limit,
       lean: true,
+      query: {
+        isDraft: req.body.isDraft
+      },
       select: {
         title: true,
         isDraft: true,
@@ -29,7 +32,11 @@ class CategoryService {
       }
     }
 
-    const response = await Model.paginate({ isDraft: req.body.isDraft }, options)
+    const response = await Model.paginate(options)
+
+    if (!response) {
+      throw new Error('Cannot get list')
+    }
 
     return {
       docs: response.docs,
@@ -37,14 +44,14 @@ class CategoryService {
     }
   }
 
-  async page<T>(req: Request, bookFilter: IFilter, Model: PaginateModel<T, {}, {}>) {
+  async page<T>(req: Request, bookFilter: QueryFilter, Model: Pagination<T>) {
     const category = await Model.findById(req.params['id']).lean()
     const books = await bookService.list(req, bookFilter, { title: 1 })
 
     return { category, books }
   }
 
-  async update<T>(req: Request, Model: PaginateModel<T, {}, {}>, requiredFields: string[]) {
+  async update<T>(req: Request, Model: Pagination<T>, requiredFields: string[]) {
     const errors = validationResult(req)
     const query = { _id: req.params['id'] }
     const $set = req.body
@@ -68,7 +75,7 @@ class CategoryService {
     return { isSuccess: true }
   }
 
-  async remove<T>(_id: string, Model: PaginateModel<T, {}, {}>) {
+  async remove<T>(_id: string, Model: Pagination<T>) {
     return await Model.deleteOne({ _id })
   }
 }

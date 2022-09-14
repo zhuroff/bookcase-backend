@@ -1,7 +1,8 @@
+// REFACTORED
 import { model, Schema } from 'mongoose'
-import { UserModel } from '../types/User'
+import { UserDocument } from '../types/User'
 
-const UserSchema = new Schema<UserModel>({
+const UserSchema = new Schema<UserDocument>({
   email: {
     type: String,
     required: true
@@ -33,4 +34,4 @@ const UserSchema = new Schema<UserModel>({
   }
 })
 
-export const User = model<UserModel>('user', UserSchema)
+export const User = model<UserDocument>('user', UserSchema)

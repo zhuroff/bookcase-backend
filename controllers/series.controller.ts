@@ -20,6 +20,7 @@ class SeriesController {
 
       res.status(200).json({
         ...response,
+        // @ts-ignore
         docs: response.docs.map((doc) => new CategoryItemDTO(doc))
       })
     } catch (error) {
@@ -35,6 +36,7 @@ class SeriesController {
       const { category, books } = await categoryService.page(req, bookFilter, Series)
 
       if (category && books !== undefined) {
+        // @ts-ignore
         res.status(200).json(new CategoryPageDTO({ ...category, books }))
       }
     } catch (error) {

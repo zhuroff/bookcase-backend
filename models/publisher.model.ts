@@ -1,10 +1,11 @@
-import { model, Schema, PaginateModel } from 'mongoose'
-import { CategoryModel, CategoryDocument } from '../types/Category'
-import paginate from 'mongoose-paginate-v2'
+// REFACTORED
+import { model, Schema } from 'mongoose'
+import { CategoryDocument } from '../types/Category'
+import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
 
-const isRequired = (): boolean => (this as unknown as CategoryModel).isDraft
+function isRequired(this: CategoryDocument): boolean { return this.isDraft }
 
-const PublisherSchema = new Schema({
+const PublisherSchema = new Schema<CategoryDocument>({
   isDraft: {
     type: Boolean,
     required: true
@@ -30,5 +31,6 @@ const PublisherSchema = new Schema({
   ]
 })
 
-PublisherSchema.plugin(paginate)
-export const Publisher = model<CategoryDocument, PaginateModel<CategoryDocument>>('publishers', PublisherSchema)
+PublisherSchema.index({ title: 'text' })
+PublisherSchema.plugin(mongoosePagination)
+export const Publisher = model<CategoryDocument, Pagination<CategoryDocument>>('publishers', PublisherSchema)

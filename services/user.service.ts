@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { validationResult } from 'express-validator'
 import { User } from '../models/user.model'
-import { UserModel, UserResponse } from '../types/User'
+import { UserDocument, UserResponse } from '../types/User'
 import { UserDTO } from '../dto/user.dto'
 import bcrypt from 'bcrypt'
 import tokenService from './token.service'
@@ -14,7 +14,7 @@ class UserService {
       throw errors.array()
     }
 
-    const { email, password }: Pick<UserModel, 'email' | 'password'> = req.body
+    const { email, password }: Pick<UserDocument, 'email' | 'password'> = req.body
     const candidate = await User.findOne({ email })
 
     if (candidate) {
@@ -32,7 +32,7 @@ class UserService {
   }
 
   async login(req: Request): Promise<UserResponse> {
-    const { email, password }: Pick<UserModel, 'email' | 'password'> = req.body
+    const { email, password }: Pick<UserDocument, 'email' | 'password'> = req.body
     const dbUser = await User.findOne({ email })
 
     if (!dbUser) {

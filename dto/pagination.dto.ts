@@ -1,3 +1,4 @@
+// REFACTORED
 export class PaginationDTO {
   totalDocs?: number
   totalPages?: number

@@ -20,6 +20,7 @@ class PublisherController {
 
       res.status(200).json({
         ...response,
+        // @ts-ignore
         docs: response.docs.map((doc) => new CategoryItemDTO(doc))
       })
     } catch (error) {
@@ -37,6 +38,7 @@ class PublisherController {
       const { category, books } = await categoryService.page(req, bookFilter, Publisher)
 
       if (category && books !== undefined) {
+        // @ts-ignore
         res.status(200).json(new CategoryPageDTO({ ...category, books }))
       }
     } catch (error) {

@@ -1,11 +1,8 @@
-import { model, Schema, Types } from 'mongoose'
+// REFACTORED
+import { model, Schema } from 'mongoose'
+import { AuthToken } from 'types/Token'
 
-interface AuthToken {
-  user: Types.ObjectId
-  refreshToken: string
-}
-
-const TokenSchema: Schema<AuthToken> = new Schema({
+const TokenSchema = new Schema<AuthToken>({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User'

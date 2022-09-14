@@ -25,6 +25,7 @@ class AuthorController {
 
       res.status(200).json({
         ...response,
+        // @ts-ignore
         docs: response.docs.map((doc) => new CategoryAuthorItemDTO(doc))
       })
     } catch (error) {

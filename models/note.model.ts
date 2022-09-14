@@ -1,8 +1,14 @@
-import { model, Schema, PaginateModel } from 'mongoose'
-import { NoteModel, NoteDocument } from '../types/Note'
-import paginate from 'mongoose-paginate-v2'
+// REFACTORED
+import { model, Schema } from 'mongoose'
+import { NoteDocument } from '../types/Note'
+import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
 
-const NoteSchema: Schema<NoteModel> = new Schema({
+const NoteSchema = new Schema<NoteDocument>({
+  isDraft: {
+    type: Boolean,
+    required: true
+  },
+
   title: {
     type: String,
     required: true
@@ -44,5 +50,5 @@ const NoteSchema: Schema<NoteModel> = new Schema({
 })
 
 NoteSchema.index({ title: 'text', dateCreated: 'text', text: 'text' })
-NoteSchema.plugin(paginate)
-export const Note = model<NoteDocument, PaginateModel<NoteDocument>>('notes', NoteSchema)
+NoteSchema.plugin(mongoosePagination)
+export const Note = model<NoteDocument, Pagination<NoteDocument>>('notes', NoteSchema)

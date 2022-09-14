@@ -1,9 +1,9 @@
 import { Request } from 'express'
 import { Types } from 'mongoose'
 import { PaginationOptions } from 'mongoose-paginate-ts'
-import { ISort, IFilter } from '../types/Common'
-import { CategoryModel } from 'types/Category'
-import { BookDocument, BookItemResponse } from '../types/Book'
+import { QuerySort, QueryFilter } from '../types/Common'
+import { CategoryDocument } from 'types/Category'
+import { BookDocument, BookItemPaginated, BookPageResponse } from '../types/Book'
 import { ListDocument } from '../types/List'
 import { Book } from '../models/book.model'
 import { Author } from '../models/author.model'
@@ -16,7 +16,7 @@ import { PaginationDTO } from '../dto/pagination.dto'
 import commonService from './common.service'
 
 class BookService {
-  async list(req: Request, filter: IFilter = {}, sort?: ISort) {
+  async list(req: Request, filter: QueryFilter = {}, sort?: QuerySort) {
     const options: PaginationOptions = {
       lean: true,
       sort: sort || req.body.sort,
@@ -75,7 +75,7 @@ class BookService {
       delete options.query.$and
     }
 
-    const response = await Book.paginate(options) as BookItemResponse
+    const response = await Book.paginate(options) as BookItemPaginated
 
     if (!response) {
       throw new Error('Cannot get response')
@@ -89,12 +89,12 @@ class BookService {
 
   async page(id: string) {
     const book = await Book.findById(id)
-      .populate({ path: 'genres', select: ['title', '_id'] })
-      .populate({ path: 'series', select: ['title', '_id'] })
-      .populate({ path: 'lists', select: ['title', '_id', 'lists'] })
-      .populate({ path: 'authors.author', select: ['title', '_id'] })
+      .populate({ path: 'genres', select: ['title'] })
+      .populate({ path: 'series', select: ['title'] })
+      .populate({ path: 'lists', select: ['title', 'lists'] })
+      .populate({ path: 'authors.author', select: ['firstName', 'lastName'] })
       .populate({ path: 'publishers.publisher', select: ['title', '_id'] })
-      .lean()
+      .lean() as BookPageResponse
 
     if (book) {
       if (book?.preCoverImage && book?.dateModified) {
@@ -109,7 +109,7 @@ class BookService {
         }
       }
 
-      // return new BookPageDTO(book)
+      return new BookPageDTO(book)
     }
 
     throw new Error('Unknown error')
@@ -136,6 +136,7 @@ class BookService {
     }, { $set }, { new: true })
 
     if (updatedBook) {
+      // @ts-ignore
       return new BookPageDTO(updatedBook)
     }
 
@@ -214,7 +215,7 @@ class BookService {
           break
         case 'genres':
           // @ts-ignore
-          acc[key] = (value as CategoryModel[]).reduce((genres, { isDeleted, isAdded, isChanged, title, _id }) => {
+          acc[key] = (value as CategoryDocument[]).reduce((genres, { isDeleted, isAdded, isChanged, title, _id }) => {
             if (isDeleted) {
               console.log('genre deleted', title)
             } else if (isAdded) {
@@ -232,21 +233,21 @@ class BookService {
           break
         case 'series':
           // @ts-ignore
-          if ((value as CategoryModel).isDeleted) {
+          if ((value as CategoryDocument).isDeleted) {
             console.log('series deleted', value)
             // @ts-ignore
-          } else if ((value as CategoryModel).isAdded) {
+          } else if ((value as CategoryDocument).isAdded) {
             console.log('series added', value)
             // @ts-ignore
-            acc[key] = new Types.ObjectId((value as CategoryModel)._id)
+            acc[key] = new Types.ObjectId((value as CategoryDocument)._id)
             // @ts-ignore
-          } else if ((value as CategoryModel).isChanged) {
+          } else if ((value as CategoryDocument).isChanged) {
             console.log('series changed', value)
             // @ts-ignore
-            acc[key] = new Types.ObjectId((value as CategoryModel)._id)
+            acc[key] = new Types.ObjectId((value as CategoryDocument)._id)
           } else {
             // @ts-ignore
-            acc[key] = new Types.ObjectId((value as CategoryModel)._id)
+            acc[key] = new Types.ObjectId((value as CategoryDocument)._id)
           }
           break
         case 'lists':

@@ -1,10 +1,8 @@
 import { Types } from 'mongoose'
-import { TEntityLink } from '../types/Common'
+import { EntityLink } from '../types/Common'
 import {
   CategoryDocument,
-  CategoryModelResponse,
   AuthorDocument,
-  AuthorModelResponse
 } from '../types/Category'
 
 export class CategoryItemDTO {
@@ -25,9 +23,9 @@ export class CategoryPageDTO {
   _id: string
   title: string
   isDraft: boolean
-  books: CategoryModelResponse['books']
+  books: any //CategoryModelResponse['books']
 
-  constructor(category: CategoryModelResponse & { _id: Types.ObjectId }) {
+  constructor(category: any /* CategoryModelResponse & { _id: Types.ObjectId } */) {
     this._id = String(category._id)
     this.title = category.title
     this.isDraft = category.isDraft
@@ -70,10 +68,10 @@ export class CategoryAuthorPageDTO {
   firstName: string
   lastName?: string
   patronymicName?: string
-  books: CategoryModelResponse['books']
-  links?: TEntityLink[]
+  books: any //CategoryModelResponse['books']
+  links?: EntityLink[]
 
-  constructor(category: AuthorModelResponse & { _id: Types.ObjectId }) {
+  constructor(category: any /* AuthorModelResponse & { _id: Types.ObjectId } */) {
     this._id = String(category._id)
     this.isDraft = category.isDraft
     this.firstName = category.firstName

@@ -1,7 +1,7 @@
 import { UserDTO } from 'dto/user.dto'
-import { Date } from 'mongoose'
+import { Date, Document } from 'mongoose'
 
-type UserModel = {
+export type UserDocument = Document & {
   password: string
   email: string
   firstName: string
@@ -10,13 +10,8 @@ type UserModel = {
   dateCreated: Date | undefined
 }
 
-type UserResponse = {
+export type UserResponse = {
   user: UserDTO;
   accessToken: string;
   refreshToken: string;
-}
-
-export {
-  UserModel,
-  UserResponse
 }

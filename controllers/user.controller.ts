@@ -1,3 +1,4 @@
+// REFACTORED
 import { Request, Response } from 'express'
 import { UserResponse } from '../types/User'
 import userService from '../services/user.service'

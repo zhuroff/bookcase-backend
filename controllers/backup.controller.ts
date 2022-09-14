@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { PaginateModel, Model } from 'mongoose'
+import { Model } from 'mongoose'
 import { Book } from '../models/book.model'
 import { Author } from '../models/author.model'
 import { Genre } from '../models/genre.model'
@@ -9,9 +9,10 @@ import { Series } from '../models/series.model'
 import { User } from '../models/user.model'
 import fs from 'fs'
 import path from 'path'
+// import { PaginationModel } from 'mongoose-paginate-ts'
 
 type BackupModel = {
-  [index: string]: PaginateModel<any> | Model<any, {}, {}>
+  [index: string]: Model<any, {}, {}>// any // PaginationModel<any> | Model<any, {}, {}>
 }
 
 const backupModels: BackupModel = {

@@ -1,17 +1,18 @@
-export interface IEntityBasic {
+// REFACTORED
+export type EntityBasic = {
   _id: string
   title: string
 }
 
-export type ISort = {
+export type QuerySort = {
   [index: string]: 1 | -1
 }
 
-export type IFilter = {
+export type QueryFilter = {
   [index: string]: any
 }
 
-export type TEntityLink = {
+export type EntityLink = {
   title: string
   url: string
 }

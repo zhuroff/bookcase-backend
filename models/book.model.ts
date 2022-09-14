@@ -1,10 +1,11 @@
+// REFACTORED
 import { model, Schema } from 'mongoose'
 import { BookDocument } from '../types/Book'
 import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
 
-const isRequired = (): boolean => (this as unknown as BookDocument).isDraft
+function isRequired(this: BookDocument): boolean { return this.isDraft }
 
-const BookSchema: Schema<BookDocument> = new Schema({
+const BookSchema = new Schema<BookDocument>({
   isDraft: {
     type: Boolean,
     required: true
