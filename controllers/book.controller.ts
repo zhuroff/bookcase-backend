@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-// import { Book } from '../models/book.model'
 import bookService from '../services/book.service'
 
 class BookController {
@@ -15,7 +14,7 @@ class BookController {
 
   async page(req: Request, res: Response) {
     try {
-      const response = await bookService.page(req.params['id'])
+      const response = await bookService.page(String(req.params['id']))
       res.status(200).json(response)
     } catch (error) {
       console.log(error)
@@ -132,7 +131,7 @@ class BookController {
 // //   }
 
 // //   try {
-// //     const bookInstance: BookModel = await Book.findById(req.params.id, bookConfig).lean()
+// //     const bookInstance: BookDocument = await Book.findById(req.params.id, bookConfig).lean()
 
 // //     const categories = [
 // //       {

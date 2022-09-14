@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { PaginateModel } from 'mongoose'
+// import { PaginateModel } from 'mongoose'
 import { Author } from '../models/author.model'
 import { Genre } from '../models/genre.model'
 import { Publisher } from '../models/publisher.model'
@@ -7,7 +7,8 @@ import { Series } from '../models/series.model'
 import { List } from '../models/list.model'
 import { Book } from '../models/book.model'
 
-const searchModels = new Map<string, PaginateModel<any>>([
+// TODO: Fix 'any' type
+const searchModels = new Map<string, any>([
   ['authors', Author],
   ['genres', Genre],
   ['publishers', Publisher],
@@ -43,7 +44,8 @@ const search = async (req: Request, res: Response) => {
       )))
 
     if (response) {
-      res.json(response.filter((result) => Object.values(result).flat().length > 0))
+      // TODO: Fix 'any' type
+      res.json(response.filter((result: any) => Object.values(result).flat().length > 0))
     } else {
       throw new Error('Nothing was found: Request error')
     }

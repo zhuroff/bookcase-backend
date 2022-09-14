@@ -9,7 +9,7 @@ class ListController {
 
       res.status(200).json({
         ...response,
-        docs: response.docs.map((doc) => new ListItemDTO(doc))
+        docs: response?.docs.map((doc) => new ListItemDTO(doc))
       })
     } catch (error) {
       res.status(500).json(error)

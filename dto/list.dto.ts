@@ -1,5 +1,5 @@
-import { ListModel, TListSection, TListSectionContent } from '../types/List'
-import { BookModel } from '../types/Book'
+import { ListDocument, Sublist } from '../types/List'
+import { BookDocument } from '../types/Book'
 import { BookItemDTO } from './book.dto'
 
 export class ListContentItem {
@@ -7,9 +7,10 @@ export class ListContentItem {
   book: BookItemDTO
   comment: string | null
 
-  constructor(content: TListSectionContent) {
+  constructor(content: any) {
     this._id = content._id
-    this.book = new BookItemDTO(content.book as BookModel)
+    // @ts-ignore
+    this.book = new BookItemDTO(content.book as BookDocument)
     this.comment = content.comment
   }
 }
@@ -20,7 +21,7 @@ export class ListItemDTO {
   isDraft: boolean
   books: number
 
-  constructor(list: ListModel) {
+  constructor(list: ListDocument) {
     this._id = list._id
     this.title = list.title
     this.isDraft = list.isDraft
@@ -32,21 +33,22 @@ export class ListPageDTO {
   _id: string
   title: string
   isDraft: boolean
-  lists: TListSection[]
+  lists: Sublist[]
 
-  constructor(list: ListModel) {
+  constructor(list: ListDocument) {
     this._id = list._id
     this.title = list.title
     this.isDraft = list.isDraft
-    this.lists = list.lists.map((list) => ({
-      _id: list._id,
-      title: list.title,
-      contents: (list.contents as TListSectionContent[]).reduce((acc, next) => {
-        if (next.book) {
-          acc.push(new ListContentItem(next))
-        }
-        return acc
-      }, [] as ListContentItem[])
-    }))
+    this.lists = list.lists
+    // this.lists = list.lists.map((list) => ({
+    //   _id: list._id,
+    //   title: list.title,
+    //   contents: (list.contents as TListSectionContent[]).reduce((acc, next) => {
+    //     if (next.book) {
+    //       acc.push(new ListContentItem(next))
+    //     }
+    //     return acc
+    //   }, [] as ListContentItem[])
+    // }))
   }
 }

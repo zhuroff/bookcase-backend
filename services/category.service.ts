@@ -33,7 +33,7 @@ class CategoryService {
 
     return {
       docs: response.docs,
-      pagination: new PaginationDTO(response)
+      pagination: new PaginationDTO(response.totalDocs, response.totalPages, response.page)
     }
   }
 

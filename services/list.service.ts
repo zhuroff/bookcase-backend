@@ -2,7 +2,7 @@ import { Request } from 'express'
 import { Book } from '../models/book.model'
 import { List } from '../models/list.model'
 import { ListPageDTO } from '../dto/list.dto'
-import { PaginationDTO } from '../dto/pagination.dto'
+// import { PaginationDTO } from '../dto/pagination.dto'
 
 class ListService {
   async list(req: Request) {
@@ -11,6 +11,9 @@ class ListService {
       sort: req.body.sort,
       limit: req.body.limit,
       lean: true,
+      query: {
+        isDraft: req.body.isDraft
+      },
       select: {
         title: true,
         isDraft: true,
@@ -18,11 +21,13 @@ class ListService {
       }
     }
 
-    const response = await List.paginate({ isDraft: req.body.isDraft }, options)
+    const response = await List.paginate(options)
 
-    return {
-      docs: response.docs,
-      pagination: new PaginationDTO(response)
+    if (response) {
+      return {
+        docs: response.docs,
+        // pagination: new PaginationDTO(response)
+      }
     }
   }
 

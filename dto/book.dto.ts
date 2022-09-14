@@ -1,35 +1,31 @@
-import { AuthorBookPage, PublisherBookPage } from 'types/Category'
-import { TListSection } from 'types/List'
-import { BookModel, BookLinks, ReadingStatus } from '../types/Book'
+import { Types, _LeanDocument } from 'mongoose'
+import { ListDocument, ListTree } from 'types/List'
+import { IEntityBasic } from '../types/Common'
+import { AuthorBookItem } from '../types/Category'
+import { BookLinks, ReadingStatus, BookDocument, BookDocumentResponse } from '../types/Book'
 
 export class BookItemDTO {
   _id: string
-  title: string
-  authors: any
-  coverImage?: string
-  genres: any
   isDraft: boolean
-  lists: any
-  publicationYear: number
-  status: ReadingStatus
+  title: string
   subtitle?: string
+  authors: AuthorBookItem[]
+  genres: IEntityBasic[]
+  coverImage?: string
+  publicationYear: number
   pages: number
+  status: ReadingStatus
+  lists: ListTree[]
   accountability?: boolean
 
-  constructor(book: any) {
-    this._id = book._id
-    this.title = book.title
-    // @ts-ignore
-    this.authors = book.authors.map(({ author }) => author)
-    this.coverImage = book.coverImage
-    this.genres = book.genres
-    this.isDraft = book.isDraft
-    // @ts-ignore
-    this.lists = !book.lists?.length ? [] : book.lists.map((list) => ({
+  #listTreeBuilder(bookID: Types.ObjectId, lists?: ListDocument[]) {
+    if (!lists?.length) return []
+
+    return lists.map((list) => ({
       ...list,
-      lists: list.lists.reduce((acc: any[], next: any) => {
-        const matched = next.contents.filter((item: any) => (
-          item.book.toString() === book._id.toString()
+      lists: list.lists.reduce<ListTree[]>((acc, next) => {
+        const matched = next.contents.filter((item) => (
+          item.book.toString() === bookID.toString()
         ))
 
         if (matched.length) {
@@ -39,8 +35,18 @@ export class BookItemDTO {
           })
         }
         return acc
-      }, [] as TListSection[])
+      }, [])
     }))
+  }
+
+  constructor(book: BookDocumentResponse) {
+    this._id = book._id
+    this.title = book.title
+    this.authors = book.authors.map(({ author }) => author)
+    this.coverImage = book.coverImage
+    this.genres = book.genres
+    this.isDraft = book.isDraft
+    this.lists = this.#listTreeBuilder(book._id, book.lists)
     this.publicationYear = book.publicationYear
     this.status = book.status
     this.subtitle = book.subtitle
@@ -49,7 +55,8 @@ export class BookItemDTO {
   }
 }
 
-export class BookPageDTO {
+export class BookPageDTO extends BookItemDTO {
+  // @ts-ignore
   authors: AuthorBookPage[]
   contents?: string
   coverType: string
@@ -58,14 +65,19 @@ export class BookPageDTO {
   format: string
   links?: BookLinks[]
   preCoverImage?: string
+  // @ts-ignore
   publishers: PublisherBookPage[]
   rating?: number
   series?: any
   status: ReadingStatus
   summary?: string
+  notes: any
 
-  constructor(book: BookModel) {
-    // super(book)
+  constructor(book: _LeanDocument<BookDocument & { _id: Types.ObjectId }>) {
+    console.log(book)
+    // @ts-ignore
+    super(book)
+    // @ts-ignore
     this.authors = book.authors
     this.contents = book.contents
     this.coverType = book.coverType
@@ -79,5 +91,6 @@ export class BookPageDTO {
     this.series = book.series
     this.status = book.status || { start: null, finish: null }
     this.summary = book.summary
+    this.notes = book.notes || []
   }
 }

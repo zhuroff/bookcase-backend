@@ -41,7 +41,8 @@ class AuthorController {
       }
       const { category, books } = await categoryService.page(req, bookFilter, Author)
 
-      if (category && books) {
+      if (category && books !== undefined) {
+        // @ts-ignore
         res.status(200).json(new CategoryAuthorPageDTO({ ...category, books }))
       }
     } catch (error) {

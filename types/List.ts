@@ -1,27 +1,23 @@
-import { ListContentItem } from 'dto/list.dto'
-import { PaginateModel, Date, Document, PopulatedDoc } from 'mongoose'
-import { BookModel } from './Book'
+import { Document, Types } from 'mongoose'
 
-export type TListSectionContent = {
-  _id: string
-  book: PopulatedDoc<BookModel>
-  comment: string | null
+export type SublistContent = Document & {
+  item: number
+  book: Types.ObjectId
+  comment?: string | null
 }
 
-export type TListSection = {
-  _id: string
+export type Sublist = Document & {
   title: string
-  contents: TListSectionContent[] | ListContentItem[]
+  contents: SublistContent[]
 }
 
-export interface ListModel extends Document {
+export type ListDocument = Document & {
   isDraft: boolean
   title: string
-  lists: TListSection[]
-  dateCreated?: Date
-  isDeleted?: boolean
-  isAdded?: boolean
-  isChanged?: boolean
+  dateCreated: Date
+  lists: Sublist[]
 }
 
-export interface IList<T extends Document> extends PaginateModel<T> { }
+export type ListTree = Pick<ListDocument, 'title' | '_id'> & {
+  lists?: ListTree[]
+}

@@ -1,13 +1,11 @@
-import { HydratedDocument, PaginateResult } from 'mongoose'
+export class PaginationDTO {
+  totalDocs?: number
+  totalPages?: number
+  page?: number
 
-export class PaginationDTO<T,> {
-  page: number | undefined
-  totalDocs: number
-  totalPages: number
-
-  constructor(entity: PaginateResult<HydratedDocument<T, {}, {}>>) {
-    this.page = entity.page
-    this.totalDocs = entity.totalDocs
-    this.totalPages = entity.totalPages
+  constructor(totalDocs = 1, totalPages = 1, page = 1) {
+    this.totalDocs = totalDocs
+    this.totalPages = totalPages
+    this.page = page
   }
 }

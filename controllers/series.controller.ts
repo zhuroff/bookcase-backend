@@ -34,7 +34,7 @@ class SeriesController {
       }
       const { category, books } = await categoryService.page(req, bookFilter, Series)
 
-      if (category && books) {
+      if (category && books !== undefined) {
         res.status(200).json(new CategoryPageDTO({ ...category, books }))
       }
     } catch (error) {

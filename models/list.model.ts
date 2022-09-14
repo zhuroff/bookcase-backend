@@ -1,10 +1,10 @@
 import { model, Schema } from 'mongoose'
-import { ListModel, IList } from '../types/List'
-import mongoosePaginate from 'mongoose-paginate-v2'
+import { ListDocument } from '../types/List';
+import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
 
-const isRequired = (): boolean => (this as unknown as ListModel).isDraft
+const isRequired = (): boolean => (this as unknown as ListDocument).isDraft
 
-const ListSchema: Schema<ListModel> = new Schema({
+const ListSchema: Schema<ListDocument> = new Schema({
   isDraft: {
     type: Boolean,
     required: true
@@ -12,8 +12,7 @@ const ListSchema: Schema<ListModel> = new Schema({
 
   title: {
     type: String,
-    required: isRequired,
-    index: true
+    required: isRequired
   },
 
   dateCreated: {
@@ -56,6 +55,5 @@ const ListSchema: Schema<ListModel> = new Schema({
 })
 
 ListSchema.index({ title: 'text' })
-ListSchema.plugin(mongoosePaginate)
-
-export const List = model<ListModel>('lists', ListSchema) as IList<ListModel>
+ListSchema.plugin(mongoosePagination)
+export const List = model<ListDocument, Pagination<ListDocument>>('lists', ListSchema)

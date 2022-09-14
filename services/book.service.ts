@@ -1,33 +1,32 @@
 import { Request } from 'express'
 import { Types } from 'mongoose'
-import { BookModel, BookModelPayload } from '../types/Book'
-import { ListModel, TListSection, TListSectionContent } from '../types/List'
+import { PaginationOptions } from 'mongoose-paginate-ts'
+import { ISort, IFilter } from '../types/Common'
+import { CategoryModel } from 'types/Category'
+import { BookDocument, BookItemResponse } from '../types/Book'
+import { ListDocument } from '../types/List'
 import { Book } from '../models/book.model'
 import { Author } from '../models/author.model'
 import { Genre } from '../models/genre.model'
 import { Publisher } from '../models/publisher.model'
 import { Series } from '../models/series.model'
 import { List } from '../models/list.model'
-import { ISort, IFilter } from 'types/Common'
 import { BookItemDTO, BookPageDTO } from '../dto/book.dto'
 import { PaginationDTO } from '../dto/pagination.dto'
 import commonService from './common.service'
-import { AuthorBookPage, AuthorBookPagePayload, CategoryModel, PublisherBookPage, PublisherBookPagePayload } from 'types/Category'
 
 class BookService {
   async list(req: Request, filter: IFilter = {}, sort?: ISort) {
-    const booksListPopulates = [
-      { path: 'genres', select: ['title', '_id'] },
-      { path: 'lists', select: ['title', '_id', 'lists'] },
-      { path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] }
-    ]
-
-    const options: IFilter = {
-      page: req.body.page || 1,
-      sort: sort || req.body.sort,
-      limit: req.body.limit || 30,
-      populate: booksListPopulates,
+    const options: PaginationOptions = {
       lean: true,
+      sort: sort || req.body.sort,
+      page: req.body.page || 1,
+      limit: req.body.limit || 30,
+      query: {
+        isDraft: req.body.isDraft || false,
+        $and: [],
+        ...filter
+      },
       select: {
         title: true,
         isDraft: true,
@@ -37,24 +36,23 @@ class BookService {
         pages: true,
         publicationYear: true,
         accountability: true
-      }
-    }
-
-    const params: IFilter = {
-      isDraft: req.body.isDraft || false,
-      $and: [],
-      ...filter
+      },
+      populate: [
+        { path: 'genres', select: ['title', '_id'] },
+        { path: 'lists', select: ['title', '_id', 'lists'] },
+        { path: 'authors.author', select: ['title', '_id', 'firstName', 'lastName', 'patronymicName'] }
+      ]
     }
 
     if (req.body.unlistedOf) {
-      params['lists'] = { $size: 0 }
-      params['genres'] = {
+      options.query.lists = { $size: 0 }
+      options.query.genres = {
         $elemMatch: { $eq: new Types.ObjectId(req.body.unlistedOf) }
       }
     }
 
     if (req.body.accountableOnly) {
-      params['$and'].push({
+      options.query.$and.push({
         $or: [
           { accountability: { $exists: false } },
           { accountability: { $eq: true } }
@@ -63,8 +61,8 @@ class BookService {
     }
 
     if (req.body.paperWithoutFile) {
-      params['format'] = { $eq: 'paperbook' }
-      params['$and'].push({
+      options.query.format = { $eq: 'paperbook' }
+      options.query.$and.push({
         $or: [
           { file: { $exists: false } },
           { file: { $eq: null } },
@@ -73,22 +71,24 @@ class BookService {
       })
     }
 
-    if (!params['$and'].length) {
-      delete params['$and']
+    if (!options.query.$and.length) {
+      delete options.query.$and
     }
 
-    const response = await Book.paginate(params, options)
+    const response = await Book.paginate(options) as BookItemResponse
+
+    if (!response) {
+      throw new Error('Cannot get response')
+    }
 
     return {
       docs: response.docs.map((doc) => new BookItemDTO(doc)),
-      pagination: new PaginationDTO(response)
+      pagination: new PaginationDTO(response.totalDocs, response.totalPages, response.page)
     }
   }
 
-  async page(id?: string) {
-    if (!id) throw new Error('Param \'id\' is not defined')
-
-    const book: BookModel = await Book.findById(id)
+  async page(id: string) {
+    const book = await Book.findById(id)
       .populate({ path: 'genres', select: ['title', '_id'] })
       .populate({ path: 'series', select: ['title', '_id'] })
       .populate({ path: 'lists', select: ['title', '_id', 'lists'] })
@@ -96,19 +96,23 @@ class BookService {
       .populate({ path: 'publishers.publisher', select: ['title', '_id'] })
       .lean()
 
-    if (book.preCoverImage && book.dateModified) {
-      const currentServerDate = new Date().getTime()
-      const bookModifiedTime = new Date(book.dateModified).getTime()
-      const timeDifference = (currentServerDate - bookModifiedTime) / 60_000
+    if (book) {
+      if (book?.preCoverImage && book?.dateModified) {
+        const currentServerDate = new Date().getTime()
+        const bookModifiedTime = new Date(book.dateModified).getTime()
+        const timeDifference = (currentServerDate - bookModifiedTime) / 60_000
 
-      if (timeDifference > 10) {
-        commonService.removeMediaFile(book.preCoverImage)
-        await this.cleanPreCoverField(id)
-        delete book.preCoverImage
+        if (timeDifference > 10) {
+          commonService.removeMediaFile(book.preCoverImage)
+          await this.cleanPreCoverField(id)
+          delete book.preCoverImage
+        }
       }
+
+      // return new BookPageDTO(book)
     }
 
-    return new BookPageDTO(book)
+    throw new Error('Unknown error')
   }
 
   async upload(req: Request) {
@@ -116,7 +120,7 @@ class BookService {
       ? `/uploads/covers/${req.file.filename}`
       : req.body.preCoverImage
 
-    const book: BookModel = await Book.findById(req.params['id']).lean()
+    const book: BookDocument = await Book.findById(req.params['id']).lean()
 
     if (book.preCoverImage) {
       commonService.removeMediaFile(book.preCoverImage)
@@ -147,7 +151,7 @@ class BookService {
     const payloadToSave = Object.entries(payload).reduce((acc, [key, value]) => {
       switch (key) {
         case 'authors':
-          acc[key] = (value as AuthorBookPage[]).reduce((authors, { isDeleted, isAdded, isChanged, role, author }) => {
+          acc[key] = (value as any/* AuthorBookPage[]*/).reduce((authors: any, { isDeleted, isAdded, isChanged, role, author }: any) => {
             if (isDeleted) {
               console.log('author deleted', author)
             } else if (isAdded) {
@@ -174,10 +178,10 @@ class BookService {
             }
 
             return authors
-          }, [] as AuthorBookPagePayload[])
+          }, [] as any/*AuthorBookPagePayload[]*/)
           break
         case 'publishers':
-          acc[key] = (value as PublisherBookPage[]).reduce((publishers, { isDeleted, isAdded, isChanged, city, code, publisher }) => {
+          acc[key] = (value as any/*PublisherBookPage[]*/).reduce((publishers: any, { isDeleted, isAdded, isChanged, city, code, publisher }: any) => {
             if (isDeleted) {
               console.log('publisher deleted', publisher)
             } else if (isAdded) {
@@ -206,7 +210,7 @@ class BookService {
             }
 
             return publishers
-          }, [] as PublisherBookPagePayload[])
+          }, [] as any/*PublisherBookPagePayload[]*/)
           break
         case 'genres':
           // @ts-ignore
@@ -246,7 +250,8 @@ class BookService {
           }
           break
         case 'lists':
-          acc[key] = (value as ListModel[]).reduce((items, { isDeleted, isAdded, isChanged, _id }) => {
+          // @ts-ignore
+          acc[key] = (value as ListDocument[]).reduce((items, { isDeleted, isAdded, isChanged, _id }) => {
             if (isDeleted) {
               console.log('list deleted', _id)
             } else if (isAdded) {
@@ -263,14 +268,14 @@ class BookService {
           }, [] as Types.ObjectId[])
           break
         case 'preCoverImage':
-          acc.coverImage = value as string
-          acc.preCoverImage = undefined
+          acc['coverImage'] = value as string
+          acc['preCoverImage'] = undefined
         default:
           // @ts-ignore
           acc[key] = value
       }
       return acc
-    }, {} as Partial<BookModelPayload>)
+    }, {} as Partial<any/*BookModelPayload*/>)
 
     console.log(payloadToSave)
     return true
@@ -322,8 +327,9 @@ class BookService {
         const doc = await List.findOne({ _id: list }).lean()
 
         if (doc) {
-          const clearedLists: TListSection[] = doc.lists.map((list) => {
-            const deletedBookIndex = (list.contents as TListSectionContent[])
+          const clearedLists: any = doc.lists.map((list) => {
+            const deletedBookIndex = (list.contents as any[])
+              // @ts-ignore
               .findIndex((content) => content.book.toString() === _id)
 
             if (deletedBookIndex > -1) {

@@ -1,6 +1,8 @@
-import { PaginateModel, PopulatedDoc, Date, Document, Types } from 'mongoose'
-import { AuthorBookPage, AuthorBookPagePayload, CategoryModel, PublisherBookPage, PublisherBookPagePayload } from './Category'
-import { ListModel } from './List'
+import { Date, Document, Types } from 'mongoose'
+import { PaginationModel } from 'mongoose-paginate-ts'
+import { AuthorBookItem } from './Category'
+import { IEntityBasic } from './Common'
+import { ListDocument } from './List'
 
 export type BookLinks = {
   url: string
@@ -13,21 +15,17 @@ export type ReadingStatus = {
   finish: Date | null
 }
 
-export interface BookModel extends Document {
+export type BookDocument = Document & {
   isDraft: boolean
   title: string
   subtitle?: string
   summary?: string
-  authors: AuthorBookPage[]
-  genres: PopulatedDoc<CategoryModel>[]
-  series: PopulatedDoc<CategoryModel>
-  publishers: PublisherBookPage[]
   format: string
   contents?: string
   coverImage?: string
   preCoverImage?: string
   coverType: string
-  dateCreated?: Date,
+  dateCreated: Date
   dateModified?: string
   description: string
   file?: string
@@ -36,16 +34,27 @@ export interface BookModel extends Document {
   pages: number
   rating?: number
   status: ReadingStatus
-  lists: PopulatedDoc<ListModel>[]
   accountability?: boolean
-}
-
-export type BookModelPayload = Omit<BookModel, 'authors' | 'genres' | 'series' | 'publishers' | 'lists'> & {
-  authors: AuthorBookPagePayload[]
-  publishers: PublisherBookPagePayload[]
+  authors: {
+    author: Types.ObjectId
+    role: string
+  }[]
+  publishers: {
+    publisher: Types.ObjectId
+    city: string
+    code: string
+  }[]
   genres: Types.ObjectId[]
   lists: Types.ObjectId[]
+  notes?: Types.ObjectId[]
   series: Types.ObjectId
 }
 
-export interface IBook<T extends Document> extends PaginateModel<T> { }
+export type PopulatedBookItemModels = {
+  authors: { author: AuthorBookItem }[]
+  genres: IEntityBasic[]
+  lists: ListDocument[]
+}
+
+export type BookDocumentResponse = Omit<BookDocument, 'authors' | 'genres' | 'lists'> & PopulatedBookItemModels
+export type BookItemResponse = PaginationModel<BookDocumentResponse> | undefined

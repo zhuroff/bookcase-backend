@@ -36,7 +36,7 @@ class PublisherController {
       }
       const { category, books } = await categoryService.page(req, bookFilter, Publisher)
 
-      if (category && books) {
+      if (category && books !== undefined) {
         res.status(200).json(new CategoryPageDTO({ ...category, books }))
       }
     } catch (error) {
