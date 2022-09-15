@@ -1,7 +1,7 @@
 // REFACTORED
+import { Date, Document, Types } from 'mongoose'
 import { BookItemDTO } from 'dto/book.dto'
 import { PaginationDTO } from 'dto/pagination.dto'
-import { Date, Document, Types } from 'mongoose'
 import { PaginationModel } from 'mongoose-paginate-ts'
 import { AuthorBookPage, PublisherBookPage } from './Category'
 import { EntityBasic } from './Common'

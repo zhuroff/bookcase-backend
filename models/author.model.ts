@@ -1,9 +1,8 @@
 // REFACTORED
 import { model, Schema } from 'mongoose'
 import { AuthorDocument } from '../types/Category'
+import { isRequiredField } from '../shared/functions'
 import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
-
-function isRequired(this: AuthorDocument): boolean { return this.isDraft }
 
 const AuthorSchema = new Schema<AuthorDocument>({
   isDraft: {
@@ -18,7 +17,7 @@ const AuthorSchema = new Schema<AuthorDocument>({
 
   firstName: {
     type: String,
-    required: isRequired
+    required: isRequiredField
   },
 
   lastName: {

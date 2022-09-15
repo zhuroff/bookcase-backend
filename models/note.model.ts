@@ -1,6 +1,7 @@
 // REFACTORED
-import { model, Schema } from 'mongoose'
-import { NoteDocument } from '../types/Note'
+import { model, Schema } from 'mongoose';
+import { NoteDocument } from '../types/Note';
+import { isRequiredField } from '../shared/functions';
 import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
 
 const NoteSchema = new Schema<NoteDocument>({
@@ -11,7 +12,7 @@ const NoteSchema = new Schema<NoteDocument>({
 
   title: {
     type: String,
-    required: true
+    required: isRequiredField
   },
 
   dateCreated: {
@@ -21,7 +22,7 @@ const NoteSchema = new Schema<NoteDocument>({
 
   text: {
     type: String,
-    required: true
+    required: isRequiredField
   },
 
   references: [

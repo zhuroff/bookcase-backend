@@ -1,9 +1,8 @@
 // REFACTORED
 import { model, Schema } from 'mongoose'
 import { CategoryDocument } from '../types/Category'
+import { isRequiredField } from '../shared/functions';
 import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
-
-function isRequired(this: CategoryDocument): boolean { return this.isDraft }
 
 const PublisherSchema = new Schema<CategoryDocument>({
   isDraft: {
@@ -13,7 +12,7 @@ const PublisherSchema = new Schema<CategoryDocument>({
 
   title: {
     type: String,
-    required: isRequired,
+    required: isRequiredField,
     index: true
   },
 

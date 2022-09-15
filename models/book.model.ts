@@ -1,9 +1,8 @@
 // REFACTORED
 import { model, Schema } from 'mongoose'
 import { BookDocument } from '../types/Book'
+import { isRequiredField } from '../shared/functions'
 import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
-
-function isRequired(this: BookDocument): boolean { return this.isDraft }
 
 const BookSchema = new Schema<BookDocument>({
   isDraft: {
@@ -13,7 +12,7 @@ const BookSchema = new Schema<BookDocument>({
 
   title: {
     type: String,
-    required: isRequired
+    required: isRequiredField
   },
 
   subtitle: {
@@ -84,12 +83,12 @@ const BookSchema = new Schema<BookDocument>({
 
   format: {
     type: String,
-    required: isRequired
+    required: isRequiredField
   },
 
   contents: {
     type: String,
-    required: isRequired
+    required: isRequiredField
   },
 
   coverImage: {
@@ -105,7 +104,7 @@ const BookSchema = new Schema<BookDocument>({
 
   coverType: {
     type: String,
-    required: isRequired
+    required: isRequiredField
   },
 
   dateCreated: {
@@ -120,7 +119,7 @@ const BookSchema = new Schema<BookDocument>({
 
   description: {
     type: String,
-    required: isRequired
+    required: isRequiredField
   },
 
   file: {
@@ -146,12 +145,12 @@ const BookSchema = new Schema<BookDocument>({
 
   publicationYear: {
     type: Number,
-    required: isRequired
+    required: isRequiredField
   },
 
   pages: {
     type: Number,
-    required: isRequired
+    required: isRequiredField
   },
 
   rating: {

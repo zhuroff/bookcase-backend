@@ -1,9 +1,8 @@
 // REFACTORED
 import { model, Schema } from 'mongoose'
 import { ListDocument } from '../types/List';
+import { isRequiredField } from '../shared/functions';
 import { mongoosePagination, Pagination } from 'mongoose-paginate-ts';
-
-function isRequired(this: ListDocument): boolean { return this.isDraft }
 
 const ListSchema = new Schema<ListDocument>({
   isDraft: {
@@ -13,7 +12,7 @@ const ListSchema = new Schema<ListDocument>({
 
   title: {
     type: String,
-    required: isRequired
+    required: isRequiredField
   },
 
   dateCreated: {
