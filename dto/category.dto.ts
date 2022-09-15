@@ -1,83 +1,75 @@
-import { Types } from 'mongoose'
+// REFACTORED
+import { LeanDocument } from 'mongoose'
 import { EntityLink } from '../types/Common'
-import {
-  CategoryDocument,
-  AuthorDocument,
-} from '../types/Category'
+import { AuthorItemResponse, AuthorPageResponse, CategoryItemResponse, CategoryPageResponse } from '../types/Category'
+import { BookItemFinalResponse } from 'types/Book'
 
-export class CategoryItemDTO {
+type ExtendibleCategories =
+  CategoryItemResponse |
+  LeanDocument<CategoryPageResponse> |
+  AuthorItemResponse |
+  LeanDocument<AuthorPageResponse>
+
+class CategoryCommon<T extends ExtendibleCategories> {
   _id: string
-  title: string
-  booksCount: number
   isDraft: boolean
 
-  constructor(category: CategoryDocument & { _id: Types.ObjectId }) {
+  constructor(category: T) {
     this._id = category._id
+    this.isDraft = category.isDraft
+  }
+}
+
+export class CategoryItemDTO extends CategoryCommon<CategoryItemResponse> {
+  title: string
+  booksCount: number
+
+  constructor(category: CategoryItemResponse) {
+    super(category)
     this.title = category.title
     this.booksCount = category.books.length
-    this.isDraft = category.isDraft
   }
 }
 
-export class CategoryPageDTO {
-  _id: string
+export class CategoryPageDTO extends CategoryCommon<LeanDocument<CategoryPageResponse>> {
   title: string
-  isDraft: boolean
-  books: any //CategoryModelResponse['books']
+  books: BookItemFinalResponse
 
-  constructor(category: any /* CategoryModelResponse & { _id: Types.ObjectId } */) {
-    this._id = String(category._id)
+  constructor(category: LeanDocument<CategoryPageResponse>, books: BookItemFinalResponse) {
+    super(category)
     this.title = category.title
-    this.isDraft = category.isDraft
-    this.books = category.books
+    this.books = books
   }
 }
 
-export class CategoryAuthorItemDTO {
-  _id: string
-  title: string
-  booksCount: number
-  isDraft: boolean
+export class CategoryAuthorItemDTO extends CategoryCommon<AuthorItemResponse> {
   firstName: string
   lastName?: string
   patronymicName?: string
+  booksCount: number
 
-  constructor(category: AuthorDocument & { _id: Types.ObjectId }) {
-    this._id = String(category._id)
-    this.booksCount = category.books.length
-    this.isDraft = category.isDraft
+  constructor(category: AuthorItemResponse) {
+    super(category)
     this.firstName = category.firstName
     this.lastName = category.lastName
     this.patronymicName = category.patronymicName
-    this.title = this.#computedTitle(category)
-  }
-
-  #computedTitle(category: AuthorDocument & { _id: Types.ObjectId }) {
-    const { firstName, lastName } = category
-    if (lastName) {
-      return `${lastName}, ${firstName}`
-    }
-
-    return firstName
+    this.booksCount = category.books.length
   }
 }
 
-export class CategoryAuthorPageDTO {
-  _id: string
-  isDraft: boolean
+export class CategoryAuthorPageDTO extends CategoryCommon<LeanDocument<AuthorPageResponse>> {
   firstName: string
   lastName?: string
   patronymicName?: string
-  books: any //CategoryModelResponse['books']
+  books: BookItemFinalResponse
   links?: EntityLink[]
 
-  constructor(category: any /* AuthorModelResponse & { _id: Types.ObjectId } */) {
-    this._id = String(category._id)
-    this.isDraft = category.isDraft
+  constructor(category: LeanDocument<AuthorPageResponse>, books: BookItemFinalResponse) {
+    super(category)
     this.firstName = category.firstName
     this.lastName = category.lastName
     this.patronymicName = category.patronymicName
-    this.books = category.books
+    this.books = books
     this.links = category.links || []
   }
 }

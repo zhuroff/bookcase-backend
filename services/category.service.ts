@@ -2,8 +2,8 @@ import { Request } from 'express'
 import { PaginationDTO } from '../dto/pagination.dto'
 import { validationResult } from 'express-validator'
 import { QueryFilter } from '../types/Common'
+import { Pagination, PaginationModel, PaginationOptions } from 'mongoose-paginate-ts'
 import bookService from './book.service'
-import { Pagination } from 'mongoose-paginate-ts'
 
 class CategoryService {
   async create<T>(req: Request, Model: Pagination<T>) {
@@ -11,12 +11,12 @@ class CategoryService {
     return await entity.save()
   }
 
-  async list<T>(
+  async list<T, U>(
     req: Request,
     Model: Pagination<T>,
-    selectExtends: { [index: string]: boolean } = {}
+    select: { [index: string]: boolean } = {}
   ) {
-    const options = {
+    const options: PaginationOptions = {
       page: req.body.page,
       sort: req.body.sort,
       limit: req.body.limit,
@@ -28,11 +28,11 @@ class CategoryService {
         title: true,
         isDraft: true,
         books: true,
-        ...selectExtends
+        ...select
       }
     }
 
-    const response = await Model.paginate(options)
+    const response = await Model.paginate(options) as PaginationModel<U> | undefined
 
     if (!response) {
       throw new Error('Cannot get list')
@@ -44,10 +44,9 @@ class CategoryService {
     }
   }
 
-  async page<T>(req: Request, bookFilter: QueryFilter, Model: Pagination<T>) {
-    const category = await Model.findById(req.params['id']).lean()
+  async page<T, U>(req: Request, bookFilter: QueryFilter, Model: Pagination<T>) {
+    const category = await Model.findById<U>(req.params['id']).lean()
     const books = await bookService.list(req, bookFilter, { title: 1 })
-
     return { category, books }
   }
 

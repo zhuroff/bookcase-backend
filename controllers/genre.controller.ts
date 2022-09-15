@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { Types } from 'mongoose'
 import { Genre } from '../models/genre.model'
 import { CategoryItemDTO, CategoryPageDTO } from '../dto/category.dto'
+import { CategoryDocument, CategoryItemResponse, CategoryPageResponse } from 'types/Category'
 import categoryService from '../services/category.service'
 
 class GenreController {
@@ -16,11 +17,10 @@ class GenreController {
 
   async list(req: Request, res: Response) {
     try {
-      const response = await categoryService.list(req, Genre)
+      const response = await categoryService.list<CategoryDocument, CategoryItemResponse>(req, Genre)
 
       res.status(200).json({
         ...response,
-        // @ts-ignore
         docs: response.docs.map((doc) => new CategoryItemDTO(doc))
       })
     } catch (error) {
@@ -35,11 +35,10 @@ class GenreController {
           $elemMatch: { $eq: new Types.ObjectId(req.params['id']) }
         }
       }
-      const { category, books } = await categoryService.page(req, bookFilter, Genre)
+      const { category, books } = await categoryService.page<CategoryDocument, CategoryPageResponse>(req, bookFilter, Genre)
 
-      if (category && books !== undefined) {
-        // @ts-ignore
-        res.status(200).json(new CategoryPageDTO({ ...category, books }))
+      if (category) {
+        res.status(200).json(new CategoryPageDTO(category, books))
       }
     } catch (error) {
       console.log(error)

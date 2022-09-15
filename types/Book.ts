@@ -1,4 +1,6 @@
 // REFACTORED
+import { BookItemDTO } from 'dto/book.dto'
+import { PaginationDTO } from 'dto/pagination.dto'
 import { Date, Document, Types } from 'mongoose'
 import { PaginationModel } from 'mongoose-paginate-ts'
 import { AuthorBookPage, PublisherBookPage } from './Category'
@@ -69,3 +71,4 @@ type BookPageResponseExcluded = BookItemResponseExcluded | 'publishers' | 'serie
 export type BookItemResponse = Omit<BookDocument, BookItemResponseExcluded> & PopulatedBookItemModels
 export type BookItemPaginated = PaginationModel<BookItemResponse> | undefined
 export type BookPageResponse = Omit<BookDocument, BookPageResponseExcluded> & PopulatedBookPageModels
+export type BookItemFinalResponse = { docs: BookItemDTO[], pagination: PaginationDTO }

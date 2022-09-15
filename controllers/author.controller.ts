@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { Types } from 'mongoose'
 import { Author } from '../models/author.model'
 import { CategoryAuthorItemDTO, CategoryAuthorPageDTO } from '../dto/category.dto'
+import { AuthorDocument, AuthorItemResponse, AuthorPageResponse } from 'types/Category'
 import categoryService from '../services/category.service'
 
 class AuthorController {
@@ -16,16 +17,15 @@ class AuthorController {
 
   async list(req: Request, res: Response) {
     try {
-      const selectExtends = {
+      const select = {
         firstName: true,
         lastName: true,
         patronymicName: true
       }
-      const response = await categoryService.list(req, Author, selectExtends)
+      const response = await categoryService.list<AuthorDocument, AuthorItemResponse>(req, Author, select)
 
       res.status(200).json({
         ...response,
-        // @ts-ignore
         docs: response.docs.map((doc) => new CategoryAuthorItemDTO(doc))
       })
     } catch (error) {
@@ -40,11 +40,10 @@ class AuthorController {
           $elemMatch: { author: { $eq: new Types.ObjectId(req.params['id']) } }
         }
       }
-      const { category, books } = await categoryService.page(req, bookFilter, Author)
+      const { category, books } = await categoryService.page<AuthorDocument, AuthorPageResponse>(req, bookFilter, Author)
 
-      if (category && books !== undefined) {
-        // @ts-ignore
-        res.status(200).json(new CategoryAuthorPageDTO({ ...category, books }))
+      if (category) {
+        res.status(200).json(new CategoryAuthorPageDTO(category, books))
       }
     } catch (error) {
       console.log(error)
