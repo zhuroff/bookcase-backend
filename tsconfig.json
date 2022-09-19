@@ -2,25 +2,47 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
     "lib": [
       "esnext"
     ],
     "sourceMap": true,
-    "rootDir": "./",
+    "rootDir": "src",
+    "outDir": "dist/src",
     "removeComments": true,
     "noEmitOnError": false,
     "strict": true,
+    "noImplicitReturns": true,
     "noImplicitAny": true,
+    "downlevelIteration": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "noUncheckedIndexedAccess": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
     "noPropertyAccessFromIndexSignature": true,
     "baseUrl": ".",
-    "types": [
-      "@types/node"
-    ],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": [
+    "src/index.ts",
+    "src/**/*.d.ts",
+    "src/types/video.ts",
+    "src/types/user.ts",
+    "src/types/token.ts",
+    "src/types/note.ts",
+    "src/types/list.ts",
+    "src/types/common.ts",
+    "src/types/category.ts",
+    "src/types/book.ts",
+    "src/types/article.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
