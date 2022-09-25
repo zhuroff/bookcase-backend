@@ -1,4 +1,5 @@
 import { Date, Document, Types } from 'mongoose'
+import { ReadingStatus } from './book'
 
 export type VideoDocument = Document & {
   isDraft: boolean

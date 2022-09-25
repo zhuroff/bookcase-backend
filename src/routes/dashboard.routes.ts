@@ -4,7 +4,7 @@ import controller from '../controllers/dashboard.controller'
 
 const router = Router()
 
-router.get(
+router.post(
   '/reading-books',
   authMiddleware,
   controller.reading
